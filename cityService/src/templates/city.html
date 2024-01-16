@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            {% for city_form in form.cities %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ city_form.city_name.label }}</h5>
+                        <div class="form-group">
+                            {{ city_form.city_name(class="form-control") }}
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                {{ city_form.max_temp.label }}
+                                {{ city_form.max_temp(class="form-control") }}
+                            </div>
+                            <div class="form-group col-md-6">
+                                {{ city_form.min_temp.label }}
+                                {{ city_form.min_temp(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="form-check">
+                            {{ city_form.rain(class="form-check-input") }}
+                            {{ city_form.rain.label(class="form-check-label") }}
+                        </div>
+                        <div class="form-check">
+                            {{ city_form.snow(class="form-check-input") }}
+                            {{ city_form.snow.label(class="form-check-label") }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-info">Subscribe</button>
+            </div>
+
+            <div>
+                {% for error in form.Errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}
