@@ -27,7 +27,6 @@ def load_user(user_id):
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-
         id_user = current_user.id
         url_redirezione = f'http://localhost:5013/cityevents/{id_user}'
         return redirect(url_redirezione)
