@@ -1,14 +1,19 @@
+import json
+
 from flask import Flask, render_template, flash, redirect, url_for, jsonify, request
 from forms import RegistrationForm, LoginForm
 from models import User, db
 from flask_login import login_user, current_user, LoginManager, logout_user
 from flask_cors import CORS
 import os
+import logging
+import jwt
+from datetime import datetime, timedelta
 
-SECRET_KEY = os.urandom(32)
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
+#app.config['SECRET_KEY'] = SECRET_KEY
 
 CORS(app)
 
@@ -29,61 +34,33 @@ def load_user(user_id):
     return None
 
 
-# @app.route("/register", methods=['GET', 'POST'])
-# def register():
-#     if current_user.is_authenticated:
-#         id_user = current_user.id
-#         url_redirezione = f'http://localhost:5013/cityevents/{id_user}'
-#         return redirect(url_redirezione)
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         user = User(username=form.data.get('username'), telegram_chat_id=form.data.get('tel_chat_id'), password=form.data.get('password'))
-#         db.session.add(user)  #Questa riga aggiunge il nuovo oggetto utente creato alla sessione SQLAlchemy.
-#         login_user(user)        #consente all'applicazione di tenere traccia dell'utente autenticato.
-#         db.session.commit()  #Questa riga conferma le modifiche apportate alla sessione del database, aggiungendo effettivamente il nuovo utente al database.
-#         flash(f'Account created for {form.username.data}!', 'success')
-#         id_user = current_user.id
-#         url_redirezione = f'http://localhost:5013/cityevents/{id_user}'
-#         return redirect(url_redirezione)
-#     return render_template('register.html', title='Register', form=form)
-
-# @app.route("/login", methods=['GET', 'POST'])
-# def login():
-#      if current_user.is_authenticated:
-#          id_user = current_user.id
-#          url_redirezione = f'http://localhost:5013/cityevents/{id_user}'
-#          return redirect(url_redirezione)
-#      form = LoginForm()
-#      if form.validate_on_submit():
-#         if db.session.query(User).filter(User.username == form.data.get('username'), User.password == form.data.get('password')).first():
-#              user = db.session.query(User).filter(User.username == form.data.get('username'), User.password == form.data.get('password')).first()
-#              login_user(user)
-#              flash('You have been logged in!', 'success')
-#              id_user = current_user.id
-#              url_redirezione = f'http://localhost:5013/cityevents/{id_user}'
-#              return redirect(url_redirezione)
-#
-#         else:
-#              flash('Login Unsuccessful. Please check username and password', 'danger')
-#      return render_template('login.html', title='Login', form=form)
 
 
-def user_register(data=None):
-    if data.get("username") == '' or data.get("password") == '' or data.get("confirmPassword") == '':
-        return jsonify({'state': 1})
-    elif data.get('password') == data.get('confirmPassword'):
-        user = User(username=data.get('username'), password=data.get('password'))
-        db.session.add(user)
-        db.session.commit()
-        login_user(user)
-        id_user = current_user.id
-        print(id_user)
-        return jsonify({'state': 0})
-    else:
-        return jsonify({'state': 2})
+@app.route("/register", methods=['POST'])
+def user_register():
+    if request.method == 'POST':
+        logging.error(request.form['username'])
+        if request.form['username'] == '' or request.form['password'] == '' or request.form['telegramChatId'] == '':
+            return jsonify({'state': 1})
+        else:
+            user = User(username=request.form['username'], password=request.form['password'], telegram_chat_id=request.form['telegramChatId'])
+            db.session.add(user)
+            db.session.commit()
+            # login_user(user)
+            # id_user = current_user.id
+            # Creazione del token con informazioni della sessione
+
+            #expiration_time = datetime.utcnow() + timedelta(days=1)
+
+            #payload = {'user_id': user.id, 'exp': expiration_time}
+            logging.error(SECRET_KEY)
+            token = jwt.encode({'user_id': user.id}, key=SECRET_KEY, algorithm='HS256')
+
+            return jsonify({'state': 0, 'token': token})
 
 
-@app.route("/login", methods=['GET', 'POST'])
+
+@app.route("/login", methods=['POST'])
 def user_login():
     if request.method == 'POST':
         username = request.form['username']  # Utilizza l'operatore di accesso diretto []
@@ -95,8 +72,10 @@ def user_login():
                                                  User.password == password).first()
             login_user(user)
             id_user = current_user.id
+
+
             print(id_user)
-            return jsonify({'state': 1, 'id_user': id_user})
+            return jsonify({'state': 1, 'token': token})
         else:
             return jsonify({'state': 0})
 
@@ -115,4 +94,5 @@ def init_db():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+
+    app.run(host="0.0.0.0", port=5001)

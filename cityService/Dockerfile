@@ -1,4 +1,5 @@
 FROM python:3.10
+ENV SECRET_KEY="mySecretKey"
 WORKDIR /src
 COPY requirements.txt .
 COPY src .

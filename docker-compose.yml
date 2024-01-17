@@ -26,7 +26,7 @@ services:
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
     ports:
-      - 5012:5012
+      - 5001:5001
     restart: always
     depends_on:
       - mysql
@@ -42,7 +42,7 @@ services:
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
     ports:
-      - 5013:5013
+      - 5002:5002
     restart: always
     depends_on:
       - mysql

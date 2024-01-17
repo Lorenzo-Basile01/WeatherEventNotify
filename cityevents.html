@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Events</title>
+</head>
+<body>
+  <form id="cityEventsForm">
+    <label for="city_name">City Name:</label>
+    <input type="text" id="city_name" name="city_name" required>
+
+    <label for="max_temp">Max Temperature:</label>
+    <input type="text" id="max_temp" name="max_temp" required>
+
+    <label for="min_temp">Min Temperature:</label>
+    <input type="text" id="min_temp" name="min_temp" required>
+
+    <label for="rain">Rain:</label>
+    <input type="checkbox" id="rain" name="rain" required>
+
+    <label for="snow">Snow:</label>
+    <input type="checkbox" id="snow" name="snow" required>
+
+    <button type="button" onclick="submitCityEvent()">Submit City Event</button>
+  </form>
+
+  <button type="button" onclick="logout()">Logout</button>
+
+  <script>
+  function submitCityEvent() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var token = urlParams.get('token');
+
+    const formData = new FormData(document.getElementById('cityEventsForm'));
+
+    // Verifica il valore effettivo della checkbox "rain" e imposta true/false
+    formData.set('rain', document.getElementById('rain').checked ? 0 : 1);
+
+    // Verifica il valore effettivo della checkbox "snow" e imposta true/false
+    formData.set('snow', document.getElementById('snow').checked ? 0 : 1);
+
+    formData.append('token', token);
+
+    // Recupero della variabile dal parametro dell'URL
+
+    // Modifica della chiamata fetch per includere il token come parametro nell'URL
+    fetch('http://localhost:5002/cityevents?token=' + encodeURIComponent(token), {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.state === 0) {
+        alert('City event inviato con successo');
+      } else {
+        alert('Errore durante invio del evento: ' + data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Errore durante la richiesta di invio dell\'evento:', error);
+      alert('Si è verificato un errore durante l\'invio dell\'evento. Riprova più tardi.');
+    });
+  }
+</script>
+</body>
+</html>

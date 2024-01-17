@@ -23,7 +23,7 @@
     function performLogin() {
         const formData = new FormData(document.getElementById('loginForm'));
 
-        fetch('http://localhost:5000/login', {
+        fetch('http://localhost:5001/login', {
             method: 'POST',
             body: formData
         })
