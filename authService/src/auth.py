@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql:3306/authDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_auth:3306/authDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)

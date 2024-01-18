@@ -11,11 +11,14 @@ import threading
 SECRET_KEY = os.urandom(32)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql:3308/apiDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_api:3308/apiDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+with app.app_context():
+    db.create_all()
+    db.session.commit()
 
 def consuma_da_kafka():
     topic_name = 'weatherInformation'
@@ -132,9 +135,6 @@ def check_weather():
 
 if __name__ == '__main__':
     time.sleep(20)
-
-    with app.app_context():
-        db.create_all()
 
     # Avvia le due funzioni in thread separati
     kafka_thread = threading.Thread(target=consuma_da_kafka)
