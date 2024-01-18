@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql:3306/users'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql:3306/authDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -47,7 +47,7 @@ def user_login():
             user = db.session.query(User).filter(User.username == username,
                                                  User.password == password).first()
 
-            token = jwt.encode({'user_id': user.id}, key=SECRET_KEY, algorithm='HS256')
+            token = jwt.encode({'user_id': user.id, 't_chat_id': user.telegram_chat_id}, key=SECRET_KEY, algorithm='HS256')
 
 
             return jsonify({'state': 0, 'token': token})

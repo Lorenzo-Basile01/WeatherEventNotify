@@ -14,18 +14,46 @@ services:
       - city_serv
     restart: always
 
-  mysql:
+  mysql_auth:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysql_auth
     environment:
-      MYSQL_ROOT_PASSWORD : '12345'
-      MYSQL_DATABASE: 'users'
+      MYSQL_ROOT_PASSWORD: '12345'
+      MYSQL_DATABASE: 'authDb'
       MYSQL_USER: 'anto'
       MYSQL_PASSWORD: '12345'
     volumes:
-      - ./mysql_volume_1:/var/lib/mysql
+      - ./mysql_volume_auth:/var/lib/mysql
     ports:
       - 3306:3306
+    restart: always
+
+  mysql_city:
+    image: mysql:8.0
+    container_name: mysql_city
+    environment:
+      MYSQL_ROOT_PASSWORD: '12345'
+      MYSQL_DATABASE: 'cityDb'
+      MYSQL_USER: 'anto'
+      MYSQL_PASSWORD: '12345'
+    volumes:
+      - ./mysql_volume_city:/var/lib/mysql
+    ports:
+      - 3307:3307
+    restart: always
+
+  mysql_api:
+    image: mysql:8.0
+    container_name: mysql_api
+    environment:
+      MYSQL_ROOT_PASSWORD: '12345'
+      MYSQL_DATABASE: 'apiDb'
+      MYSQL_USER: 'anto'
+      MYSQL_PASSWORD: '12345'
+    volumes:
+      - ./mysql_volume_api:/var/lib/mysql
+    ports:
+      - 3308:3308
     restart: always
 
   auth_serv:
@@ -43,7 +71,7 @@ services:
       - 5001:5001
     restart: always
     depends_on:
-      - mysql
+      - mysql_auth
 
   city_serv:
     build:
@@ -60,9 +88,9 @@ services:
       - 5002:5002
     restart: always
     depends_on:
-      - mysql
+      - mysql_city
       - auth_serv
-    
+
   api_serv:
     build:
       context: ./apiService
@@ -76,7 +104,7 @@ services:
       SECRET_KEY: "mySecretKey"
     restart: always
     depends_on:
-      - mysql
+      - mysql_api
       - auth_serv
       - city_serv
       - kafka
@@ -111,6 +139,6 @@ services:
     image: wurstmeister/zookeeper:latest
     container_name: zookeeper
     depends_on:
-     - kafka
+      - kafka
     ports:
       - 2181:2181

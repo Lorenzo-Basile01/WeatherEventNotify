@@ -1,20 +1,18 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-from flask_login import UserMixin
+
 
 db = SQLAlchemy()
 
-class User(db.Model, UserMixin):
+class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.Text, nullable=False)
-    password = db.Column(db.Text, nullable=False)
     telegram_chat_id = db.Column(db.Text, nullable=False)
 
     info_meteo = relationship('Info_meteo', back_populates='user')
 
 
-class Info_meteo(db.Model, UserMixin):
+class Info_meteo(db.Model):
     __tablename__ = 'info_meteo'
 
     info_id = db.Column(db.Integer, primary_key=True)
