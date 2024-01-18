@@ -1,14 +1,9 @@
-import json
 
-from flask import Flask, render_template, redirect, flash
+from flask import Flask, request, jsonify
 from models import User, Info_meteo, db
-from forms import SubscriptionForm
-from flask_login import login_user, current_user, LoginManager, logout_user
-from flask import request, jsonify
 from flask_cors import CORS
 import os
 import jwt
-from datetime import datetime, timedelta
 import logging
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -24,26 +19,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-
-# @app.route('/cityevents/<id_user>', methods=['GET', 'POST'])
-# def home(id_user):
-#     form = SubscriptionForm()
-#     if form.is_submitted():
-#         for city_form in form.cities:
-#             info_meteo = Info_meteo(user_id=id_user, city=city_form.city_name.data, t_max=city_form.max_temp.data, t_min=city_form.min_temp.data, rain=city_form.rain.data, snow=city_form.snow.data)
-#             db.session.add(info_meteo)
-#             db.session.commit()
-#             flash('city event succesfully submitted', 'success')
-#     return render_template('city.html', form=form)
-#
-#
-# @app.route('/logout', methods=['GET', 'POST'])
-# def logout():
-#     url_redirezione = f'http://localhost:5012/login'
-#     return redirect(url_redirezione)
-
-@app.route('/cityevents', methods=['POST'])
-def home():
+@app.route('/cityevents/<token>', methods=['POST'])
+def home(token):
     if request.method == 'POST':
         if request.form['rain'] == 1:
             rain = True
@@ -54,16 +31,23 @@ def home():
             snow = True
         else:
             snow = False
-        logging.error(request)
-        logging.error(request.data)
-        token = request.args.get('token')
+
+        if request.form['max_temp'] == '':
+            t_max = None
+        else:
+            t_max = request.form['max_temp']
+
+        if request.form['min_temp'] == '':
+            t_min = None
+        else:
+            t_min = request.form['min_temp']
+
         logging.error(token)
+
         decoded_token = jwt.decode(token, key=SECRET_KEY, algorithms=['HS256'])
 
-
-
         info_meteo = Info_meteo(user_id=decoded_token['user_id'], city=request.form['city_name'],
-                                t_max=request.form['max_temp'], t_min=request.form['min_temp'], rain=rain,
+                                t_max=t_max, t_min=t_min, rain=rain,
                                 snow=snow)
         db.session.add(info_meteo)
         db.session.commit()
@@ -72,7 +56,6 @@ def home():
 
 @app.route("/log_out", methods=['GET', 'POST'])
 def log_out():
-    logout_user()
     return jsonify({'state': 0})
 
 

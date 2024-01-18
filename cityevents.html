@@ -42,10 +42,11 @@
 
     formData.append('token', token);
 
+
     // Recupero della variabile dal parametro dell'URL
 
     // Modifica della chiamata fetch per includere il token come parametro nell'URL
-    fetch('http://localhost:5002/cityevents?token=' + encodeURIComponent(token), {
+    fetch('http://localhost:5002/cityevents/' + token, {
       method: 'POST',
       body: formData
     })
