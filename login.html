@@ -4,6 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        body{
+            background-color: grey;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loginForm {
+            background-color: white;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 100px;   
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: darkslategrey;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        #loginForm a {
+            display: block;
+            text-align: right;
+            padding: 10px;
+            border: none;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
 </head>
 <body>
   <form id="loginForm">
@@ -14,6 +59,8 @@
     <input type="password" id="password" name="password" required>
 
     <button type="button" onclick="performLogin()">Login</button>
+    <button type="button">Register</button>
+
 </form>
 
 <!-- Un div per visualizzare i messaggi di risposta del login -->

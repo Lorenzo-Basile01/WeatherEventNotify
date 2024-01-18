@@ -4,6 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>City Events</title>
+    <style>
+      body{
+          background-color: grey;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+
+      #cityEventsForm {
+          background-color: white;
+          width: 300px;
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+          margin-top: 40px;   
+      }
+
+      button {
+          margin-top: 10px;
+          background-color: darkslategrey;
+          color: white;
+          padding: 10px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 100%;
+      }
+
+      .logout {
+          margin-top: 10px;
+          background-color: darkslategrey;
+          color: white;
+          padding: 10px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          width: 100%;
+      }
+
+      input {
+          width: 100%;
+          padding: 8px;
+          margin-bottom: 16px;
+          box-sizing: border-box;
+      }
+
+      #rain, #snow {
+        width: 30%;
+      }
+
+  </style>
 </head>
 <body>
   <form id="cityEventsForm">
@@ -23,9 +75,10 @@
     <input type="checkbox" id="snow" name="snow" required>
 
     <button type="button" onclick="submitCityEvent()">Submit City Event</button>
+    <button type="button" class="logout">Logout</button>
   </form>
 
-  <button type="button" onclick="logout()">Logout</button>
+  
 
   <script>
   function submitCityEvent() {
@@ -39,6 +92,8 @@
 
     // Verifica il valore effettivo della checkbox "snow" e imposta true/false
     formData.set('snow', document.getElementById('snow').checked ? 0 : 1);
+
+    formData.append('token', token);
 
 
     // Recupero della variabile dal parametro dell'URL

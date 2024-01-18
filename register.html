@@ -4,6 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration</title>
+    <style>
+        body{
+            background-color: grey;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #registrationForm {
+            background-color: white;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 80px;   
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: darkslategrey;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        #registrationForm a {
+            display: block;
+            text-align: right;
+            padding: 10px;
+            border: none;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
 </head>
 <body>
   <form id="registrationForm">
@@ -20,6 +65,8 @@
     <input type="password" id="confirmPassword" name="confirmPassword" required>
 
     <button type="button" onclick="performRegistration()">Register</button>
+    <button type="button">Login</button>
+
   </form>
 
   <!-- Un div per visualizzare i messaggi di risposta della registrazione -->
