@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city:3307/cityDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city/cityDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
@@ -98,4 +98,4 @@ def init_db():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5002)
+    app.run(host="0.0.0.0")

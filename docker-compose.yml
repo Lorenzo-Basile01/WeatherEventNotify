@@ -68,7 +68,7 @@ services:
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
     ports:
-      - 5001:5001
+      - 5000:5000
     restart: always
     depends_on:
       - mysql_auth
@@ -85,7 +85,7 @@ services:
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
     ports:
-      - 5002:5002
+      - 5001:5001
     restart: always
     depends_on:
       - mysql_city

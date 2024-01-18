@@ -5,4 +5,4 @@ COPY requirements.txt .
 COPY src .
 RUN /usr/local/bin/python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
-CMD ["python","auth.py"]
+CMD ["flask","--app","auth", "run", "--host=0.0.0.0", "--port=5000"]
