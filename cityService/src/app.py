@@ -9,10 +9,7 @@ import logging
 import json
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = SECRET_KEY
-
 CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city/cityDb'

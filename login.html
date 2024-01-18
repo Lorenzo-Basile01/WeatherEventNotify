@@ -59,7 +59,7 @@
     <input type="password" id="password" name="password" required>
 
     <button type="button" onclick="performLogin()">Login</button>
-    <button type="button">Register</button>
+    <button type="button" onclick="performRegister()">Register</button>
 
 </form>
 
@@ -89,6 +89,10 @@
                 console.error('Errore durante la richiesta di login:', error);
                 document.getElementById('loginResult').innerHTML = 'Si è verificato un errore durante il login. Riprova più tardi.';
             });
+    }
+
+    function performRegister(){
+        window.location.href = 'register.html';
     }
 </script>
 </body>

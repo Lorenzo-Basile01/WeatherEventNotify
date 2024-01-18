@@ -65,7 +65,7 @@
     <input type="password" id="confirmPassword" name="confirmPassword" required>
 
     <button type="button" onclick="performRegistration()">Register</button>
-    <button type="button">Login</button>
+    <button type="button" onclick="performLogin1()">Login</button>
 
   </form>
 
@@ -110,6 +110,10 @@
                 console.error('Errore durante la richiesta di registrazione:', error);
                 alert('Si è verificato un errore durante la registrazione. Riprova più tardi.');
             });
+    }
+
+    function performLogin1(){
+        window.location.href = 'login.html';
     }
   </script>
 </body>

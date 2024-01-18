@@ -55,10 +55,32 @@ def user_login():
             return jsonify({'state': 1})
 
 
-@app.route("/log_out", methods=['GET', 'POST'])
-def log_out():
+def verify_token(token):
+    try:
+        decoded_token = jwt.decode(token, key=SECRET_KEY, algorithms=['HS256'])
+        user_id = decoded_token['user_id']
+        return user_id
+    except jwt.ExpiredSignatureError:
+        # Il token è scaduto
+        return None
+    except jwt.InvalidTokenError:
+        # Il token non è valido
+        return None
 
-    return jsonify({'state': 0})
+@app.route("/logout", methods=['GET', 'POST'])
+def user_logout():
+    token = request.form.get('token')
+
+    # Verifica e decodifica il token
+    user_id = verify_token(token)
+
+    if user_id is not None:
+        # Implementa la logica di logout (ad esempio, invalida il token lato server)
+        # ...
+
+        return jsonify({'state': 0, 'message': 'Logout effettuato con successo'})
+    else:
+        return jsonify({'state': 1, 'message': 'Token non valido'})
 
 
 @app.before_request
