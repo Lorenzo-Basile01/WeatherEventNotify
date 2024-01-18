@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+
+  gateway:
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - 8085:8085
+    depends_on:
+      - auth_serv
+      - city_serv
+    restart: always
+
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -25,6 +38,7 @@ services:
         MYSQL_USER: 'anto'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
+        SECRET_KEY: "mySecretKey"
     ports:
       - 5001:5001
     restart: always
@@ -41,6 +55,7 @@ services:
         MYSQL_USER: 'anto'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
+        SECRET_KEY: "mySecretKey"
     ports:
       - 5002:5002
     restart: always
@@ -58,7 +73,7 @@ services:
       MYSQL_USER: 'anto'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'
-      OTHER_ENV_VARIABLE: value
+      SECRET_KEY: "mySecretKey"
     restart: always
     depends_on:
       - mysql

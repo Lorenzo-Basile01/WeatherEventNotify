@@ -22,7 +22,6 @@ db.init_app(app)
 @app.route("/register", methods=['POST'])
 def user_register():
     if request.method == 'POST':
-        logging.error(request.form['username'])
         if request.form['username'] == '' or request.form['password'] == '' or request.form['telegramChatId'] == '':
             return jsonify({'state': 1})
         else:

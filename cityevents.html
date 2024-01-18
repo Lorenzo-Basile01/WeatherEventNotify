@@ -40,13 +40,11 @@
     // Verifica il valore effettivo della checkbox "snow" e imposta true/false
     formData.set('snow', document.getElementById('snow').checked ? 0 : 1);
 
-    formData.append('token', token);
-
 
     // Recupero della variabile dal parametro dell'URL
 
     // Modifica della chiamata fetch per includere il token come parametro nell'URL
-    fetch('http://localhost:5002/cityevents/' + token, {
+    fetch('http://localhost:8085/city_serv/cityevents' + token, {
       method: 'POST',
       body: formData
     })

@@ -12,7 +12,6 @@ app = Flask(__name__)
 # app.config['SECRET_KEY'] = SECRET_KEY
 
 CORS(app)
-CORS(app, origins="http://localhost:5002")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql:3306/users'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
