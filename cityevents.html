@@ -55,7 +55,7 @@
       if (data.state === 0) {
         alert('City event inviato con successo');
       } else {
-        alert('Errore durante invio del evento: ' + data.message);
+        alert('Errore durante invio del evento: ' + data.state);
       }
     })
     .catch(error => {

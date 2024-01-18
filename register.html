@@ -51,7 +51,7 @@
                 if (data.state === 0) {
                     alert('Registrazione avvenuta con successo ${data.token}');
                     var token = data.token;
-                    window.location.href = 'cityevents.html/token?=' + encodeURIComponent(token);
+                    window.location.href = 'cityevents.html?token=' + token;
 
                 } else if (data.state === 1) {
                     alert('Username, Telegram Chat ID o password mancanti');

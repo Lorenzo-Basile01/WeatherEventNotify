@@ -30,8 +30,10 @@
             .then(response => response.json())
             .then(data => {
 
-                if (data.state) {
+                if (data.state === 0) {
                     document.getElementById('loginResult').innerHTML = 'Login riuscito per utente ${data.username}';
+                    var token = data.token;
+                    window.location.href = 'cityevents.html?token=' + token;
                 } else {
                     document.getElementById('loginResult').innerHTML = 'Errore durante il login: ${data.message}';
                 }
