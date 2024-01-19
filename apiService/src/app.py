@@ -23,7 +23,7 @@ def init_db():
         db.session.commit()
 
 def consuma_da_kafka():
-    topic_name = 'weatherInformation'
+    topic_name = 'weatherInformations'
     time.sleep(10)
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
 
@@ -34,15 +34,18 @@ def consuma_da_kafka():
                 json_message = record.value.decode('utf-8')
                 dictionary_message = json.loads(json_message)
                 logging.error(dictionary_message)
+                with app.app_context():
+                    if not db.session.query(User).filter(User.id == dictionary_message['user_id']).first():
+                        user = User(id=dictionary_message['user_id'], telegram_chat_id=dictionary_message['t_chat_id'])
 
-                if not db.session.query(User).filter(User.id == dictionary_message['user_id']).first():
-                    user = User(id=dictionary_message['user_id'], telegram_chat_id=dictionary_message['t_chat_id'])
-                    db.session.add(user)
+                        db.session.add(user)
+                        db.session.commit()
 
-                info_meteo = Info_meteo(user_id=dictionary_message['user_id'], city=dictionary_message['city'],
+                    info_meteo = Info_meteo(user_id=dictionary_message['user_id'], city=dictionary_message['city'],
                                         t_max=dictionary_message['tmax'], t_min=dictionary_message['tmin'], rain=dictionary_message['state_r'],
                                         snow=dictionary_message['state_s'])
-                with app.app_context():
+
+
                     db.session.add(info_meteo)
                     db.session.commit()
 
@@ -100,18 +103,18 @@ def check_weather():
                     api_t_max = temp_data['temp_max']
                     api_t_max_C = api_t_max-273.15
 
-                    rain = False
-                    snow = False
+                    rain = 0
+                    snow = 0
                     t_max = None
                     t_min = None
 
                     send = False
 
                     if meteo_data_r == 1 and user_city_event.rain == 1:
-                        rain = True
+                        rain = 1
                         send = True
                     if meteo_data_s == 1 and user_city_event.snow == 1:
-                        snow = True
+                        snow = 1
                         send = True
                     if user_city_event.t_max is not None and  api_t_max_C >= user_city_event.t_max:
                         t_max = api_t_max_C

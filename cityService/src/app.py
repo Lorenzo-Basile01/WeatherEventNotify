@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from models import User, Info_meteo, db
 from flask_cors import CORS
 from kafka import KafkaProducer
+from urllib.parse import quote
 import time
 import os
 import jwt
@@ -33,14 +34,14 @@ def send_kafka(message):
 def home(token):
     if request.method == 'POST':
         if request.form['rain'] == 1:
-            rain = True
+            rain = 1
         else:
-            rain = False
+            rain = 0
 
         if request.form['snow'] == 1:
-            snow = True
+            snow = 1
         else:
-            snow = False
+            snow = 0
 
         if request.form['max_temp'] == '':
             t_max = None
@@ -54,7 +55,8 @@ def home(token):
 
         logging.error(token)
 
-        decoded_token = jwt.decode(token, key=SECRET_KEY, algorithms=['HS256'])
+        encoded_token = quote(token)
+        decoded_token = jwt.decode(encoded_token, key=SECRET_KEY, algorithms=['HS256'])
 
         if not db.session.query(User).filter(User.id == decoded_token['user_id']).first():
             user = User(id=decoded_token['user_id'], telegram_chat_id=decoded_token['t_chat_id'])
@@ -68,13 +70,13 @@ def home(token):
         db.session.commit()
 
         message_payload = {
-            'user_id': user.id,
+            'user_id': decoded_token['user_id'],
             'city': info_meteo.city,
             'state_r': info_meteo.rain,
             'state_s': info_meteo.snow,
             'tmax': info_meteo.t_max,
             'tmin': info_meteo.t_min,
-            't_chat_id': user.telegram_chat_id
+            't_chat_id': decoded_token['t_chat_id']
         }
 
         send_kafka(message_payload)
