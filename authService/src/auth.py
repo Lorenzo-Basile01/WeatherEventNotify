@@ -9,7 +9,6 @@ import jwt
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 app = Flask(__name__)
-#app.config['SECRET_KEY'] = SECRET_KEY
 
 CORS(app)
 
@@ -17,6 +16,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_auth/authDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+invalid_tokens = []  # Lista per memorizzare i token invalidati
 
 
 @app.route("/register", methods=['POST'])
@@ -42,17 +43,20 @@ def user_login():
         username = request.form['username']  # Utilizza l'operatore di accesso diretto []
         password = request.form['password']
 
-        if db.session.query(User).filter(User.username == username,
-                                         User.password == password).first():
-            user = db.session.query(User).filter(User.username == username,
-                                                 User.password == password).first()
+        user = db.session.query(User).filter(User.username == username,User.password == password).first()
+        if user:
+            if user.id in invalid_tokens:
+                logging.error(invalid_tokens)
+                invalid_tokens.remove(user.id)
 
+            logging.error(invalid_tokens)
+            # Genera un nuovo token valido
             token = jwt.encode({'user_id': user.id, 't_chat_id': user.telegram_chat_id}, key=SECRET_KEY, algorithm='HS256')
-
-
-            return jsonify({'state': 0, 'token': token})
+            return jsonify({'state': 0, 'message': 'Login effettuato con successo', 'token': token})
         else:
-            return jsonify({'state': 1})
+            return jsonify({'state': 1, 'message': 'Credenziali non valide'})
+
+
 
 
 def verify_token(token):
@@ -67,6 +71,7 @@ def verify_token(token):
         # Il token non è valido
         return None
 
+
 @app.route("/logout", methods=['GET', 'POST'])
 def user_logout():
     token = request.form.get('token')
@@ -75,9 +80,9 @@ def user_logout():
     user_id = verify_token(token)
 
     if user_id is not None:
-        # Implementa la logica di logout (ad esempio, invalida il token lato server)
-        # ...
-
+        # Aggiungi il token alla lista di token invalidati
+        invalid_tokens.append(user_id)
+        logging.error(invalid_tokens)
         return jsonify({'state': 0, 'message': 'Logout effettuato con successo'})
     else:
         return jsonify({'state': 1, 'message': 'Token non valido'})

@@ -16,9 +16,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
-    db.session.commit()
+@app.before_request
+def init_db():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
 
 def consuma_da_kafka():
     topic_name = 'weatherInformation'

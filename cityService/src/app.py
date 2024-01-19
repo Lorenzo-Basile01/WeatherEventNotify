@@ -82,11 +82,6 @@ def home(token):
         return jsonify({'state': 0, 'message': 'City event inviato con successo'})
 
 
-@app.route("/log_out", methods=['GET', 'POST'])
-def log_out():
-    return jsonify({'state': 0})
-
-
 @app.before_request
 def init_db():
     with app.app_context():
@@ -95,4 +90,4 @@ def init_db():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run()
