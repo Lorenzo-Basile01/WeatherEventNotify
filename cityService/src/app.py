@@ -3,6 +3,8 @@ from models import User, Info_meteo, db
 from flask_cors import CORS
 from kafka import KafkaProducer
 from urllib.parse import quote
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter
 import time
 import os
 import jwt
@@ -11,8 +13,12 @@ import json
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 app = Flask(__name__)
+
+metrics = PrometheusMetrics(app)
+
 CORS(app)
 
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city/cityDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

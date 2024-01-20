@@ -102,6 +102,9 @@ services:
       MYSQL_USER: 'anto'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'
+      SECRET_KEY: "mySecretKey"
+    ports:
+      - 5002:5002
     restart: always
     depends_on:
       - mysql_api

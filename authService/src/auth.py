@@ -27,6 +27,7 @@ logged_users_metric = Counter(
 
 CORS(app)
 
+app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_auth/authDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

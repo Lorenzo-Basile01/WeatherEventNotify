@@ -1,9 +1,10 @@
-import logging
 
 from kafka import KafkaConsumer
 from flask import Flask
 from telegram import Bot
-import json, asyncio, time, os
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter
+import json, asyncio, time, os, logging
 
 #
 # SECRET_KEY = os.urandom(32)
