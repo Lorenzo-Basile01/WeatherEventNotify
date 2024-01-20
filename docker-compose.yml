@@ -158,6 +158,7 @@ services:
     depends_on:
       - cadvisor
       - node_exporter
+      - auth_serv
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest

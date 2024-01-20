@@ -9,3 +9,7 @@ scrape_configs:
   - job_name: 'node_exporter'
     static_configs:
       - targets: ['node_exporter:9100']
+
+  - job_name: 'auth_serv'
+    static_configs:
+      - targets: ['auth_serv:5000']

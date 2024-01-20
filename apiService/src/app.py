@@ -16,12 +16,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-@app.before_request
-def init_db():
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
-
 def consuma_da_kafka():
     topic_name = 'weatherInformations'
     time.sleep(10)
@@ -139,6 +133,11 @@ def check_weather():
 
 
 if __name__ == '__main__':
+
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     time.sleep(20)
 
     # Avvia le due funzioni in thread separati

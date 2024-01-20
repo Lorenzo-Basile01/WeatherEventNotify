@@ -57,6 +57,7 @@ def home(token):
 
         encoded_token = quote(token)
         decoded_token = jwt.decode(encoded_token, key=SECRET_KEY, algorithms=['HS256'])
+        logging.error(decoded_token)
 
         if not db.session.query(User).filter(User.id == decoded_token['user_id']).first():
             user = User(id=decoded_token['user_id'], telegram_chat_id=decoded_token['t_chat_id'])
