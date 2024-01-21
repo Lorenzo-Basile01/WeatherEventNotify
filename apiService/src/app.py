@@ -2,7 +2,7 @@ from flask import Flask
 from models import User, Info_meteo, db
 from kafka import KafkaProducer, KafkaConsumer
 from prometheus_flask_exporter import PrometheusMetrics
-from prometheus_client import Gauge
+from prometheus_client import Gauge, start_http_server
 import psutil
 import random
 import time
@@ -42,7 +42,7 @@ def measure_metrics():
     simulated_response_time = random.uniform(0.1, 1.0)
     api_response_time.set(simulated_response_time)
 
-    time.sleep(5)
+    #time.sleep(5)
 
 
 def consuma_da_kafka():
@@ -73,7 +73,7 @@ def consuma_da_kafka():
 
 def send_kafka(message):
     topic_name = 'weatherNotification'
-    time.sleep(10)
+    #time.sleep(10)
     producer = KafkaProducer(bootstrap_servers='kafka:9095')
     json_message = json.dumps(message)
     producer.send(topic_name, json_message.encode('utf-8'))
@@ -153,15 +153,15 @@ def check_weather():
                 if send:
                     send_kafka(message_payload)
 
-    time.sleep(10)
+    #time.sleep(10)
 
 
-@app.before.request
 def loop_execution():
     while True:
         consuma_da_kafka()
         check_weather()
         measure_metrics()
+        time.sleep(10)
 
 
 if __name__ == '__main__':
@@ -184,4 +184,11 @@ if __name__ == '__main__':
     # kafka_thread.join()
     # weather_thread.join()
 
-    app.run()
+
+    #thread = threading.Thread(target=loop_execution)
+    #thread.start()
+
+    start_http_server(5002)
+
+    loop_execution()
+
