@@ -6,7 +6,6 @@ from prometheus_client import Gauge, start_http_server
 import psutil
 import random
 import time
-import time
 import requests
 import os
 import json
@@ -47,7 +46,7 @@ def measure_metrics():
 
 def consuma_da_kafka():
     topic_name = 'weatherInformations'
-    time.sleep(10)
+    #time.sleep(10)
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
     for key, value in consumer.poll(1.0).items():
         for record in value:
@@ -170,23 +169,6 @@ if __name__ == '__main__':
         db.session.commit()
 
     time.sleep(20)
-    # # Avvia le due funzioni in thread separati
-    # kafka_thread = threading.Thread(target=consuma_da_kafka)
-    # weather_thread = threading.Thread(target=check_weather)
-    # metrics_thread = threading.Thread(target=measure_metrics)
-    #
-    # metrics_thread.start()
-    # kafka_thread.start()
-    # weather_thread.start()
-    #
-    # # thread.join() necessario perche entrambi i thread stanno accedendo al database che è quindi condiviso tra loro
-    # metrics_thread.join()
-    # kafka_thread.join()
-    # weather_thread.join()
-
-
-    #thread = threading.Thread(target=loop_execution)
-    #thread.start()
 
     start_http_server(5002)
 

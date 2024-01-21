@@ -16,6 +16,12 @@ app = Flask(__name__)
 
 metrics = PrometheusMetrics(app)
 
+users_city_request_metric = Counter(
+    'users_city_request_total', 'Numero totale di richieste a city_serv'
+)
+# same_user_request_metric = Counter(
+#     'same_user_request_total', 'Numero totale di richieste a city_serv dallo stesso utente'
+# )
 CORS(app)
 
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -38,6 +44,7 @@ def send_kafka(message):
 
 @app.route('/cityevents/<token>', methods=['POST'])
 def home(token):
+    users_city_request_metric.inc()
     if request.method == 'POST':
         if request.form['rain'] == 1:
             rain = 1

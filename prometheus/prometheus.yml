@@ -14,6 +14,14 @@ scrape_configs:
     static_configs:
       - targets: ['auth_serv:5000']
 
+  - job_name: 'city_serv'
+    static_configs:
+      - targets: ['city_serv:5001']
+
   - job_name: 'api_serv'
     static_configs:
       - targets: ['api_serv:5002']
+
+  - job_name: 'nfy_serv'
+    static_configs:
+      - targets: ['nfy_serv:5003']

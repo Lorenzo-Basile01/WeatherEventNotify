@@ -117,6 +117,8 @@ services:
       context: ./notifyService
       dockerfile: Dockerfile
     container_name: nfy_serv
+    ports:
+      - 5003:5003
     restart: always
     depends_on:
       - api_serv
@@ -162,6 +164,9 @@ services:
       - cadvisor
       - node_exporter
       - auth_serv
+      - api_serv
+      - city_serv
+      - notify_serv
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest
