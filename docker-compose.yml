@@ -166,7 +166,7 @@ services:
       - auth_serv
       - api_serv
       - city_serv
-      - notify_serv
+      - nfy_serv
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest
@@ -183,3 +183,11 @@ services:
     ports:
       - "9100:9100"
 
+  #sla_manager:
+   # build:
+  #    context: ./SLA_Manager
+  #    dockerfile: Dockerfile
+  #  ports:
+  #    - "5050:5050"
+  #  depends_on:
+  #    - prometheus

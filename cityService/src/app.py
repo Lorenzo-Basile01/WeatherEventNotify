@@ -4,12 +4,13 @@ from flask_cors import CORS
 from kafka import KafkaProducer
 from urllib.parse import quote
 from prometheus_flask_exporter import PrometheusMetrics
-from prometheus_client import Counter
+from prometheus_client import Counter, Gauge
 import time
 import os
 import jwt
 import logging
 import json
+
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 app = Flask(__name__)
@@ -17,11 +18,10 @@ app = Flask(__name__)
 metrics = PrometheusMetrics(app)
 
 users_city_request_metric = Counter(
-    'users_city_request_total', 'Numero totale di richieste a city_serv'
-)
-# same_user_request_metric = Counter(
-#     'same_user_request_total', 'Numero totale di richieste a city_serv dallo stesso utente'
-# )
+    'users_city_request_total', 'Numero totale di richieste a city_serv')
+
+api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
+
 CORS(app)
 
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -34,7 +34,6 @@ topic_name = 'weatherInformations'
 
 
 def send_kafka(message):
-    time.sleep(10)
     producer = KafkaProducer(bootstrap_servers='kafka:9095')
     json_message = json.dumps(message)
     producer.send(topic_name, json_message.encode('utf-8'))
@@ -44,8 +43,14 @@ def send_kafka(message):
 
 @app.route('/cityevents/<token>', methods=['POST'])
 def home(token):
+
+    request_start_time = time.time()
+
     users_city_request_metric.inc()
     if request.method == 'POST':
+
+        logging.error(request.form)
+
         if request.form['rain'] == 1:
             rain = 1
         else:
@@ -94,6 +99,10 @@ def home(token):
         }
 
         send_kafka(message_payload)
+
+        request_end_time = time.time()
+        response_time = request_end_time - request_start_time
+        api_response_time.set(response_time)
 
         return jsonify({'state': 0, 'message': 'City event inviato con successo'})
 
