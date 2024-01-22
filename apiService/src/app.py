@@ -2,14 +2,16 @@ from flask import Flask
 from models import User, Info_meteo, db
 from kafka import KafkaProducer, KafkaConsumer
 from prometheus_flask_exporter import PrometheusMetrics
-from prometheus_client import Gauge, start_http_server
+from prometheus_client import Gauge, start_http_server, Counter
 import psutil
+import shutil
 import time
 import requests
 import os
 import json
 import logging
 import threading
+
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 app = Flask(__name__)
@@ -25,6 +27,12 @@ db.init_app(app)
 memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentuale')
 cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
 
+# Metrica per lo spazio su disco utilizzato
+disk_space_used = Gauge('disk_space_used', 'Disk space used by the application in bytes')
+
+# Metriche per il conteggio delle connessioni al database
+db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+
 
 def measure_metrics():
     while True:
@@ -36,6 +44,9 @@ def measure_metrics():
         cpu_percent = psutil.cpu_percent(interval=1)
         cpu_usage.set(cpu_percent)
 
+        disk_space = shutil.disk_usage('/')
+        disk_space_used.set(disk_space.used)
+
         time.sleep(5)
 
 
@@ -43,6 +54,7 @@ def consuma_da_kafka():
     topic_name = 'weatherInformations'
     # time.sleep(10)
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
+
     while True:
         for key, value in consumer.poll(1.0).items():
             for record in value:
@@ -51,6 +63,7 @@ def consuma_da_kafka():
                 dictionary_message = json.loads(json_message)
                 logging.error(dictionary_message)
                 with app.app_context():
+                    db_connections_total.inc()
                     if not db.session.query(User).filter(User.id == dictionary_message['user_id']).first():
                         user = User(id=dictionary_message['user_id'], telegram_chat_id=dictionary_message['t_chat_id'])
 
@@ -82,10 +95,11 @@ def check_weather():
     while True:
         with app.app_context():
 
+            db_connections_total.inc()
             users = db.session.query(User).all()
 
             for user in users:
-
+                db_connections_total.inc()
                 user_city_events = db.session.query(Info_meteo).filter(Info_meteo.user_id == user.id).all()
                 for user_city_event in user_city_events:
 

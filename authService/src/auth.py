@@ -25,6 +25,9 @@ logged_users_metric = Counter(
     'logged_users_total', 'Numero totale di utenti loggati'
 )
 
+# Metriche per il conteggio delle connessioni al database
+db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+
 CORS(app)
 
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -41,20 +44,25 @@ def user_register():
     if request.method == 'POST':
         if request.form['username'] == '' or request.form['password'] == '' or request.form['telegramChatId'] == '':
             return jsonify({'state': 1})
+
         else:
-            user = User(username=request.form['username'], password=request.form['password'],
-                        telegram_chat_id=request.form['telegramChatId'])
-            db.session.add(user)
-            db.session.commit()
+            user = db.session.query(User).filter(User.username == request.form['username']).first()
+            if not user:
+                db_connections_total.inc()
+                user = User(username=request.form['username'], password=request.form['password'],
+                            telegram_chat_id=request.form['telegramChatId'])
+                db.session.add(user)
+                db.session.commit()
 
-            # incremento metrica register counter
-            registered_users_metric.inc()
+                # incremento metrica register counter
+                registered_users_metric.inc()
 
-            # Creazione del token con informazioni della sessione
-            token = jwt.encode({'user_id': user.id, 't_chat_id': user.telegram_chat_id}, key=SECRET_KEY,
-                               algorithm='HS256')
+                # Creazione del token con informazioni della sessione
+                token = jwt.encode({'user_id': user.id, 't_chat_id': user.telegram_chat_id}, key=SECRET_KEY,
+                                   algorithm='HS256')
 
-            return jsonify({'state': 0, 'token': token})
+                return jsonify({'state': 0, 'token': token})
+            return jsonify({'state': 2})
 
 
 @app.route("/login", methods=['POST'])
@@ -63,6 +71,7 @@ def user_login():
         username = request.form['username']  # Utilizza l'operatore di accesso diretto []
         password = request.form['password']
 
+        db_connections_total.inc()
         user = db.session.query(User).filter(User.username == username, User.password == password).first()
         if user:
             if user.id in invalid_tokens:

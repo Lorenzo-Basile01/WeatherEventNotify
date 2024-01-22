@@ -22,6 +22,9 @@ users_city_request_metric = Counter(
 
 api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
 
+# Metriche per il conteggio delle connessioni al database
+db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+
 CORS(app)
 
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -77,6 +80,7 @@ def home(token):
         decoded_token = jwt.decode(encoded_token, key=SECRET_KEY, algorithms=['HS256'])
         logging.error(decoded_token)
 
+        db_connections_total.inc()
         if not db.session.query(User).filter(User.id == decoded_token['user_id']).first():
             user = User(id=decoded_token['user_id'], telegram_chat_id=decoded_token['t_chat_id'])
             db.session.add(user)

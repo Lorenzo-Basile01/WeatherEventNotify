@@ -102,8 +102,8 @@
 
                 } else if (data.state === 1) {
                     alert('Username, Telegram Chat ID o password mancanti');
-                } else {
-                    alert('Errore durante la registrazione');
+                } else if (data.state === 2){
+                    alert('username non utilizzabile');
                 }
             })
             .catch(error => {
