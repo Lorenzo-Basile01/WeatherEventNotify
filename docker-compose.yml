@@ -56,6 +56,20 @@ services:
       - 3308:3306
     restart: always
 
+  mysql_SLA:
+    image: mysql:8.0
+    container_name: mysql_SLA
+    environment:
+      MYSQL_ROOT_PASSWORD: '12345'
+      MYSQL_DATABASE: 'slaDb'
+      MYSQL_USER: 'anto'
+      MYSQL_PASSWORD: '12345'
+    volumes:
+      - ./mysql_volume_sla:/var/lib/mysql
+    ports:
+      - 3310:3306
+    restart: always
+
   auth_serv:
     build:
       context: ./authService
@@ -183,11 +197,19 @@ services:
     ports:
       - "9100:9100"
 
-  #sla_manager:
-   # build:
-  #    context: ./SLA_Manager
-  #    dockerfile: Dockerfile
-  #  ports:
-  #    - "5050:5050"
-  #  depends_on:
-  #    - prometheus
+  sla_manager:
+    container_name: sla_manager
+    build:
+      context: ./SLA_Manager
+      dockerfile: Dockerfile
+    environment:
+      MYSQL_DATABASE: 'users'
+      MYSQL_USER: 'anto'
+      MYSQL_PASSWORD: '12345'
+      MYSQL_ROOT_PASSWORD: '12345'
+      SECRET_KEY: "mySecretKey"
+    ports:
+      - "5050:5050"
+    depends_on:
+      - prometheus
+      - mysql_SLA

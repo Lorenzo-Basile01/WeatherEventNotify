@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLA_Manager</title>
+    <style>
+        body{
+            background-color: grey;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #SLAForm {
+            background-color: white;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;   
+        }
+
+        button {
+            margin-top: 10px;
+            background-color: darkslategrey;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        #SLAForm a {
+            display: block;
+            text-align: right;
+            padding: 10px;
+            border: none;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <form id="SLAForm">
+        <label for="metric_name">Metric name:</label>
+        <input type="text" id="metric_name" name="metric_name" required>
+
+        <label for="desidered_value">Desidered Value:</label>
+        <input type="text" id="desidered_value" name="desidered_value" required>
+
+        <label for="job_name">Job name:</label>
+        <input type="text" id="job_name" name="job_name" required>
+
+        <button type="button" onclick="AddMetric()">Add metric</button>
+        <button type="button" onclick="RemoveMetric()">Remove metric</button>
+        <button type="button" onclick="MetricState()">Metric State</button>
+        <button type="button" onclick="PastViolations()">Past violations</button>
+        <!-- <button type="button" onclick="FindMetric()">Violation probability</button>-->
+</form>
+
+<!-- Un div per visualizzare i messaggi di risposta del login -->
+<div id="SLAResult"></div>
+
+<script>
+    function AddMetric() {
+        const formData = new FormData(document.getElementById('SLAForm'));
+
+        fetch('http://localhost:5050/add_metric', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.message === 0) {
+                    document.getElementById('SLAResult').innerHTML = 'SLA metric inserita con successo';
+
+                } else {
+                    document.getElementById('SLAResult').innerHTML = 'Errore durante l\'add';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante la richiesta', error);
+                alert('Si è verificato un errore durante la richiesta');
+            });
+    }
+
+    function RemoveMetric() {
+        const formData = new FormData(document.getElementById('SLAForm'));
+
+        fetch('http://localhost:5050/remove_metric', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.message === 0) {
+                    document.getElementById('SLAResult').innerHTML = 'SLA metric rimossa con successo';
+                } else {
+                    document.getElementById('SLAResult').innerHTML = 'Errore durante la rimozione';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante la richiesta', error);
+                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+            });
+    }
+
+    function MetricState() {
+        const formData = new FormData(document.getElementById('SLAForm'));
+
+        fetch('http://localhost:5050/sla_current_state', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.state === 0) {
+                    // Creazione della stringa HTML con un elenco non ordinato
+                    var listaHTML = "<ul>" +
+                        "<li>" + "current value: " + data.current_value + "</li>" +
+                        "<li>" + "desired value: " + data.desired_value + "</li>" +
+                        "<li>" + "violation: " + data.violation + "</li>" +
+                        "</ul>";
+                    document.getElementById('SLAResult').innerHTML = listaHTML;
+
+                } else {
+                    document.getElementById('SLAResult').innerHTML = 'Metrica non presente nel contratto';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante la richiesta', error);
+                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+            });
+    }
+
+    function PastViolations() {
+        const formData = new FormData(document.getElementById('SLAForm'));
+
+        fetch('http://localhost:5050/sla_current_state', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.state === 0) {
+                    // Creazione della stringa HTML con un elenco non ordinato
+                    var listaHTML = "<ul>" +
+                        "<li>" + "current value: " + data.current_value + "</li>" +
+                        "<li>" + "violations count last hour: " + data.violations_count_last_hour + "</li>" +
+                        "<li>" + "violations count last 3 hours: " + data.violations_count_last_3_hours + "</li>" +
+                        "<li>" + "violations count last 6 hours: " + data.violations_count_last_6_hours + "</li>" +
+                        "</ul>";
+                    document.getElementById('SLAResult').innerHTML = listaHTML;
+                } else {
+                    document.getElementById('SLAResult').innerHTML = 'Metrica non presente nel contratto';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante la richiesta', error);
+                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+            });
+    }
+
+</script>
+</body>
+</html>
