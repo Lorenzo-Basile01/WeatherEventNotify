@@ -40,7 +40,7 @@ class Violation(db.Model):
     sla_id = db.Column(db.Integer, db.ForeignKey('sla.id'), nullable=False)
     value = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    sla = relationship('SLA', back_populates='violation')
+    sla = relationship('SLA', back_populates='violations')
 
 # Inizializzazione delle metriche di Prometheus
 # sla_violations_counter = prometheus_client.Counter('sla_violations_total', 'Total number of SLA violations')
