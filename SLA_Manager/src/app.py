@@ -24,23 +24,23 @@ CORS(app)
 
 
 # Definizione del modello del SLA
-class SLA(db.Model):
+class SLA_table(db.Model):
     __tablename__ = 'sla'
 
     id = db.Column(db.Integer, primary_key=True)
     metric_name = db.Column(db.String(50), nullable=False)
     desired_value = db.Column(db.Float, nullable=False)
-    violations = relationship('Violation', back_populates='sla')
+    #violations = relationship('Violation', back_populates='sla')
 
 #backref='sla', lazy=True
 # Definizione del modello delle violazioni
 class Violation(db.Model):
-    __tablename__ = 'violation'
+    __tablename__ = 'violations'
     id = db.Column(db.Integer, primary_key=True)
     sla_id = db.Column(db.Integer, db.ForeignKey('sla.id'), nullable=False)
     value = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    sla = relationship('SLA', back_populates='violations')
+    sla = relationship('SLA_table')#, back_populates='violations')
 
 # Inizializzazione delle metriche di Prometheus
 # sla_violations_counter = prometheus_client.Counter('sla_violations_total', 'Total number of SLA violations')
@@ -56,34 +56,39 @@ def init_db():
 @app.route('/add_metric', methods=['POST'])
 def add_metric():
     if request.method == 'POST':
-        logging.error(request)
-        logging.error(request.form['metric_name'])
-        logging.error(db.session.query(SLA).filter(SLA.metric_name == request.form['metric_name']).first())
-        with app.app_context():
-            if db.session.query(SLA).filter(SLA.metric_name == request.form['metric_name']).first():
-                return jsonify({'message': 1})
-            else:
-                sla = SLA(metric_name=request.form['metric_name'], desired_value=request.form['desired_value'])
-                db.session.add(sla)
-                db.session.commit()
-                return jsonify({'message': 0})
+        if db.session.query(SLA_table).filter(SLA_table.metric_name == request.form['metric_name']).first():
+            return jsonify({'message': 1})
+        else:
+            sla = SLA_table(metric_name=request.form['metric_name'], desired_value=request.form['desired_value'])
+            db.session.add(sla)
+            db.session.commit()
+            return jsonify({'message': 0})
 
 
 @app.route('/remove_metric', methods=['POST'])
 def remove_metric():
-    sla = db.session.query(SLA).filter(SLA.metric_name == request.form['metric_name']).first()
+    sla = db.session.query(SLA_table).filter(SLA_table.metric_name == request.form['metric_name']).first()
     if sla:
         db.session.delete(sla)
         db.session.commit()
-    return jsonify({'message': 'SLA removed successfully'})
+        return jsonify({'message': 0})
+    else:
+        return jsonify({'message': 1})
 
 
 # API per la query dello stato del SLA
 @app.route('/sla_current_state', methods=['POST'])
 def get_sla_status():
-    sla = SLA.query.filter_by(metric_name=request.form['metric_name']).first()
+    sla = SLA_table.query.filter_by(metric_name=request.form['metric_name']).first()
     if sla:
-        current_value = prometheus_request(sla.metric_name)
+        data = prometheus_request(sla.metric_name)
+
+        list_current_value = data['data']['result'][0]['value']
+        current_value = float(list_current_value[1])
+
+        logging.error(current_value)
+        logging.error(sla.desired_value)
+
         violation = current_value > sla.desired_value
         return jsonify({
             'state': 0,
@@ -97,7 +102,7 @@ def get_sla_status():
 
 @app.route('/sla_past_violations/', methods=['POST'])
 def get_sla_past_violations():
-    sla = SLA.query.filter_by(metric_name=request.form['metric_name']).first()
+    sla = SLA_table.query.filter_by(metric_name=request.form['metric_name']).first()
     if sla:
 
         # Calcolo del numero di violazioni nelle ultime 1, 3, 6 ore
@@ -123,14 +128,14 @@ def get_sla_past_violations():
 
 
 def prometheus_request(metric_name):
-    url = "http://localhost:9090/api/v1/query"
+    url = "http://prometheus:9090/api/v1/query"
     params = {
-        'query': 'metric_name',
+        'query': metric_name,
         # 'time': 'timestamp', questo se mi interessano info su tempi non attuali
     }
 
-    response = requests.get(url, params=params)
-
+    response = requests.post(url, params=params)
+    logging.error(response.json())
     if response.status_code == 200:
         data = response.json()
         logging.error(data)
@@ -140,18 +145,23 @@ def prometheus_request(metric_name):
 def monitor_system_metrics():
     logging.error("MONITORING")
     # Esempio di monitoraggio di una metrica (si prega di adattare alla tua logica effettiva)
-    metric_name = SLA.metric_name
-    current_value = prometheus_request(metric_name)
+    with app.app_context():
+        sla_elements = db.session.query(SLA_table).all()
+        for sla in sla_elements:
+            metric_name = sla.metric_name
+            data = prometheus_request(metric_name)
 
-    sla = SLA.query.filter_by(metric_name=metric_name).first()
+            list_current_value = data['data']['result'][0]['value']
+            current_value = float(list_current_value[1])
+            sla = SLA_table.query.filter_by(metric_name=metric_name).first()
 
-    if sla:
-        # Verifica se c'è una violazione
-        if current_value > sla.desired_value:
-            # Registra la violazione nella tabella 'Violation'
-            violation = Violation(sla_id=sla.id, value=current_value, timestamp=datetime.utcnow())
-            db.session.add(violation)
-            db.session.commit()
+            if sla:
+                # Verifica se c'è una violazione
+                if current_value > sla.desired_value:
+                    # Registra la violazione nella tabella 'Violation'
+                    violation = Violation(sla_id=sla.id, value=current_value, timestamp=datetime.utcnow())
+                    db.session.add(violation)
+                    db.session.commit()
 
 
 # Configura l'intervallo di esecuzione della funzione (ogni mezz'ora)
