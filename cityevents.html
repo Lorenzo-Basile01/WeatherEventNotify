@@ -39,7 +39,7 @@
           border-radius: 5px;
           border: 2px solid black;
           cursor: pointer;
-          width: 27%;
+          width: 350px;
       }
 
       input {
@@ -54,7 +54,7 @@
       }
 
       .sla{
-          width: 27%;
+          width: 350px;
           border-radius: 5px;
           border: 2px solid black;
           cursor: pointer;
@@ -93,10 +93,10 @@
     const formData = new FormData(document.getElementById('cityEventsForm'));
 
     // Verifica il valore effettivo della checkbox "rain" e imposta true/false
-    formData.set('rain', document.getElementById('rain').checked ? 0 : 1);
+    formData.set('rain', document.getElementById('rain').checked === true ? 1 : 0);
 
     // Verifica il valore effettivo della checkbox "snow" e imposta true/false
-    formData.set('snow', document.getElementById('snow').checked ? 0 : 1);
+    formData.set('snow', document.getElementById('snow').checked === true ? 1 : 0);
 
     fetch('http://localhost:8085/city_serv/cityevents/' + encodeURIComponent(token), {
       method: 'POST',
@@ -106,7 +106,10 @@
     .then(data => {
       if (data.state === 0) {
         alert('City event inviato con successo');
-      } else {
+      }else if(data.state === 1) {
+          alert('Inserire una città');
+      }
+      else {
         alert('Errore durante invio del evento: ' + data.state);
       }
     })

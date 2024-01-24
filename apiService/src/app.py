@@ -77,6 +77,7 @@ def check_weather():
     api_key = 'a5c03ad3d1dedee0979f9ae116dce6ca'
 
     while True:
+        time.sleep(20)
         with app.app_context():
 
             db_connections_total.inc()
@@ -88,11 +89,11 @@ def check_weather():
                 for user_city_event in user_city_events:
 
                     city_name = user_city_event.city
-
                     api_url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}'
 
                     response = requests.get(api_url)
                     weather_data = response.json()
+                    logging.error(weather_data)
                     weather_list = weather_data['weather']
                     meteo_data = weather_list[0]['main']
 
@@ -140,7 +141,7 @@ def check_weather():
                     if send:
                         send_kafka(message_payload)
 
-        time.sleep(10)
+
 
 
 def loop_execution():

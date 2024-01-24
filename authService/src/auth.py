@@ -1,9 +1,10 @@
+from threading import Thread
 from flask import Flask, jsonify, request
 from models import User, db
 from flask_cors import CORS
 from prometheus_flask_exporter import PrometheusMetrics
-from prometheus_client import Counter
-import os, logging, jwt
+from prometheus_client import Counter, Gauge
+import os, logging, jwt, psutil, time, schedule, shutil
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -22,6 +23,15 @@ metrics = PrometheusMetrics(app)
 registered_users_metric = Counter('registered_users_total', 'Numero totale di utenti registrati')
 logged_users_metric = Counter('logged_users_total', 'Numero totale di utenti loggati')
 db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentuale')
+cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
+disk_space_used = Gauge('disk_space_used', 'Disk space used by the application in bytes')
+
+@app.before_request
+def init_db():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
 
 @app.route("/register", methods=['POST'])
 def user_register():
@@ -99,11 +109,33 @@ def user_logout():
         return jsonify({'state': 1, 'message': 'Token non valido'})
 
 
-@app.before_request
-def init_db():
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
+def measure_metrics():
+
+    logging.error("AUTH_METRICS")
+
+    memory_percent = psutil.virtual_memory().percent
+    memory_usage.set(memory_percent)
+
+    cpu_percent = psutil.cpu_percent(interval=1)
+    cpu_usage.set(cpu_percent)
+
+    disk_space = shutil.disk_usage('/')
+    disk_space_used.set(disk_space.used)
+
+
+schedule.every(1).minutes.do(measure_metrics)
+
+
+# Funzione per eseguire il job in un thread separato
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+
+# Avvia il thread per eseguire il job in background
+scheduler_thread = Thread(target=run_scheduler)
+scheduler_thread.start()
 
 
 if __name__ == '__main__':

@@ -22,11 +22,13 @@ scrape_configs:
     static_configs:
       - targets: ['api_serv:5002']
 
+  - job_name: 'nfy_serv'
+    static_configs:
+      - targets: ['nfy_serv:5003']
+
   #- job_name: 'sla_manager'
   #  static_configs:
-   #   - targets: ['sla_manager:5050']
+  #    - targets: ['sla_manager:5050']
 
 
-  #- job_name: 'nfy_serv'
-   # static_configs:
-    #  - targets: ['nfy_serv:5003']
+
