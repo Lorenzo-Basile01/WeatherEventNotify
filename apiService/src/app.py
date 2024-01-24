@@ -65,7 +65,6 @@ def consuma_da_kafka():
 
 def send_kafka(message):
     topic_name = 'weatherNotification'
-    # time.sleep(10)
     producer = KafkaProducer(bootstrap_servers='kafka:9095')
     json_message = json.dumps(message)
     producer.send(topic_name, json_message.encode('utf-8'))
@@ -75,9 +74,8 @@ def send_kafka(message):
 
 def check_weather():
     api_key = 'a5c03ad3d1dedee0979f9ae116dce6ca'
-
+    time.sleep(20)
     while True:
-        time.sleep(20)
         with app.app_context():
 
             db_connections_total.inc()
@@ -152,7 +150,7 @@ def loop_execution():
     measure_metrics_thread.start()
     check_weather_thread.start()
 
-    time.sleep(10)
+    time.sleep(20)
 
 
 if __name__ == '__main__':
@@ -160,6 +158,5 @@ if __name__ == '__main__':
         db.create_all()
         db.session.commit()
 
-    time.sleep(20)
     start_http_server(5002)
     loop_execution()

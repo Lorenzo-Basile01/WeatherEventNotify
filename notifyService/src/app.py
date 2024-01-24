@@ -1,11 +1,8 @@
-import shutil
 from threading import Thread
-import psutil
-import schedule
 from kafka import KafkaConsumer
 from prometheus_client import Gauge, start_http_server
 from telegram import Bot
-import json, asyncio, time, os, logging
+import json, asyncio, time, os, logging, shutil, psutil, schedule
 
 telegram_token = '6731451948:AAHNHAVNRG2EI89uGxPE7b0g11v3FZTpadk'
 
