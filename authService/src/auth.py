@@ -3,48 +3,31 @@ from models import User, db
 from flask_cors import CORS
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter
-import os
-import logging
-import jwt
+import os, logging, jwt
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 app = Flask(__name__)
-
-metrics = PrometheusMetrics(app)
-# La linea di codice metrics = PrometheusMetrics(app) è parte dell'utilizzo della libreria prometheus-flask-exporter
-# in un'app Flask. Questo codice inizializza un oggetto PrometheusMetrics associato all'istanza dell'applicazione
-# Flask (app). L'oggetto metrics fornisce una serie di funzionalità per la raccolta e l'esposizione di metriche per la tua applicazione.
-
-# metriche prometheus
-registered_users_metric = Counter(
-    'registered_users_total', 'Numero totale di utenti registrati'
-)
-# metriche prometheus
-logged_users_metric = Counter(
-    'logged_users_total', 'Numero totale di utenti loggati'
-)
-
-# Metriche per il conteggio delle connessioni al database
-db_connections_total = Counter('db_connections_total', 'Total number of database connections')
-
-CORS(app)
-
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_auth/authDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-
+CORS(app)
 invalid_tokens = []  # Lista per memorizzare i token invalidati
 
+metrics = PrometheusMetrics(app)
+
+
+registered_users_metric = Counter('registered_users_total', 'Numero totale di utenti registrati')
+logged_users_metric = Counter('logged_users_total', 'Numero totale di utenti loggati')
+db_connections_total = Counter('db_connections_total', 'Total number of database connections')
 
 @app.route("/register", methods=['POST'])
 def user_register():
     if request.method == 'POST':
         if request.form['username'] == '' or request.form['password'] == '' or request.form['telegramChatId'] == '':
             return jsonify({'state': 1})
-
         else:
             user = db.session.query(User).filter(User.username == request.form['username']).first()
             if not user:
@@ -54,7 +37,6 @@ def user_register():
                 db.session.add(user)
                 db.session.commit()
 
-                # incremento metrica register counter
                 registered_users_metric.inc()
 
                 # Creazione del token con informazioni della sessione
@@ -68,7 +50,7 @@ def user_register():
 @app.route("/login", methods=['POST'])
 def user_login():
     if request.method == 'POST':
-        username = request.form['username']  # Utilizza l'operatore di accesso diretto []
+        username = request.form['username']
         password = request.form['password']
 
         db_connections_total.inc()
@@ -107,11 +89,9 @@ def verify_token(token):
 def user_logout():
     token = request.form.get('token')
 
-    # Verifica e decodifica il token
     user_id = verify_token(token)
 
     if user_id is not None:
-        # Aggiungi il token alla lista di token invalidati
         invalid_tokens.append(user_id)
         logging.error(invalid_tokens)
         return jsonify({'state': 0, 'message': 'Logout effettuato con successo'})

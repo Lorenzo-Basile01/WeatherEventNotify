@@ -5,33 +5,23 @@ from kafka import KafkaProducer
 from urllib.parse import quote
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Gauge
-import time
-import os
-import jwt
-import logging
-import json
+import time, os , jwt, logging, json
 
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 app = Flask(__name__)
-
-metrics = PrometheusMetrics(app)
-
-users_city_request_metric = Counter(
-    'users_city_request_total', 'Numero totale di richieste a city_serv')
-
-api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
-
-# Metriche per il conteggio delle connessioni al database
-db_connections_total = Counter('db_connections_total', 'Total number of database connections')
-
-CORS(app)
-
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city/cityDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+CORS(app)
+metrics = PrometheusMetrics(app)
+
+
+users_city_request_metric = Counter('users_city_request_total', 'Numero totale di richieste a city_serv')
+api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
+db_connections_total = Counter('db_connections_total', 'Total number of database connections')
 
 topic_name = 'weatherInformations'
 
@@ -74,13 +64,12 @@ def home(token):
         else:
             t_min = request.form['min_temp']
 
-        logging.error(token)
-
         encoded_token = quote(token)
         decoded_token = jwt.decode(encoded_token, key=SECRET_KEY, algorithms=['HS256'])
         logging.error(decoded_token)
 
         db_connections_total.inc()
+
         if not db.session.query(User).filter(User.id == decoded_token['user_id']).first():
             user = User(id=decoded_token['user_id'], telegram_chat_id=decoded_token['t_chat_id'])
             db.session.add(user)

@@ -1,4 +1,4 @@
-import time
+import time, requests, os
 from datetime import datetime, timedelta
 import logging
 from threading import Thread
@@ -7,9 +7,6 @@ import schedule
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
-import prometheus_client
-import requests
-import os
 
 app = Flask(__name__)
 
@@ -19,7 +16,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_SLA/slaDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy()
 db.init_app(app)
-
 CORS(app)
 
 
@@ -41,10 +37,6 @@ class Violation(db.Model):
     value = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     sla = relationship('SLA_table')#, back_populates='violations')
-
-# Inizializzazione delle metriche di Prometheus
-# sla_violations_counter = prometheus_client.Counter('sla_violations_total', 'Total number of SLA violations')
-
 
 @app.before_request
 def init_db():
@@ -144,7 +136,7 @@ def prometheus_request(metric_name):
 
 def monitor_system_metrics():
     logging.error("MONITORING")
-    # Esempio di monitoraggio di una metrica (si prega di adattare alla tua logica effettiva)
+
     with app.app_context():
         sla_elements = db.session.query(SLA_table).all()
         for sla in sla_elements:
@@ -164,7 +156,7 @@ def monitor_system_metrics():
                     db.session.commit()
 
 
-# Configura l'intervallo di esecuzione della funzione (ogni mezz'ora)
+# Configura dell'intervallo di esecuzione della funzione (ogni mezz'ora)
 schedule.every(1).minutes.do(monitor_system_metrics)
 
 
@@ -181,5 +173,3 @@ scheduler_thread.start()
 
 if __name__ == '__main__':
     app.run()
-    # Esegui questa funzione periodicamente o in risposta a eventi del sistema
-    # per monitorare le metriche e rilevare eventuali violazioni

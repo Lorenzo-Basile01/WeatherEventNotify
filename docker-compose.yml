@@ -12,6 +12,7 @@ services:
     depends_on:
       - auth_serv
       - city_serv
+      - sla_manager
     restart: always
 
   mysql_auth:
@@ -154,7 +155,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: 'weatherNotification:1:1,weatherInformations:1:1'
-      KAFKA_MESSAGE_MAX_BYTES: 2000000000  # Imposta la dimensione massima a 2 megabyte
+      KAFKA_MESSAGE_MAX_BYTES: 2000000000
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -185,6 +186,7 @@ services:
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest
+    container_name: cadvisor
     ports:
       - "8080:8080"
     volumes:
@@ -195,6 +197,7 @@ services:
 
   node_exporter: # raccolta metriche prestazioni host
     image: prom/node-exporter:latest
+    container_name: node_exporter
     ports:
       - "9100:9100"
 

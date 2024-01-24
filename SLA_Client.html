@@ -14,17 +14,18 @@
         }
 
         #SLAForm {
-            background-color: white;
+            background-color: black;
+            color: white;
             width: 300px;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;   
+            margin-top: 5px;
         }
 
         button {
-            margin-top: 10px;
+            margin-top: 5px;
             background-color: darkslategrey;
             color: white;
             padding: 10px;
@@ -37,7 +38,7 @@
         input {
             width: 100%;
             padding: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             box-sizing: border-box;
         }
 
@@ -49,9 +50,21 @@
             text-decoration: none;
             color: black;
         }
+        .home{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 30px;
+            width: 27%;
+            border-radius: 5px;
+            border: 2px solid black;
+            cursor: pointer;
+            margin-top: -5px;
+        }
     </style>
 </head>
 <body>
+    <button type="button" class="home" onclick="PerformHome()">Home</button>
     <form id="SLAForm">
         <label for="metric_name">Metric name:</label>
         <input type="text" id="metric_name" name="metric_name" required>
@@ -69,14 +82,13 @@
         <!-- <button type="button" onclick="FindMetric()">Violation probability</button>-->
 </form>
 
-<!-- Un div per visualizzare i messaggi di risposta del login -->
 <div id="SLAResult"></div>
 
 <script>
     function AddMetric() {
         const formData = new FormData(document.getElementById('SLAForm'));
 
-        fetch('http://localhost:5050/add_metric', {
+        fetch('http://localhost:8085/sla_manager/add_metric', {
             method: 'POST',
             body: formData
         })
@@ -84,10 +96,10 @@
             .then(data => {
 
                 if (data.message === 0) {
-                    document.getElementById('SLAResult').innerHTML = 'SLA metric inserita con successo';
+                    alert('SLA metric inserita con successo');
 
                 } else {
-                    document.getElementById('SLAResult').innerHTML = 'Errore durante l\'add';
+                    alert('Errore durante l\'add');
                 }
             })
             .catch(error => {
@@ -99,7 +111,7 @@
     function RemoveMetric() {
         const formData = new FormData(document.getElementById('SLAForm'));
 
-        fetch('http://localhost:5050/remove_metric', {
+        fetch('http://localhost:8085/sla_manager/remove_metric', {
             method: 'POST',
             body: formData
         })
@@ -107,21 +119,21 @@
             .then(data => {
 
                 if (data.message === 0) {
-                    document.getElementById('SLAResult').innerHTML = 'SLA metric rimossa con successo';
+                    alert('SLA metric rimossa con successo');
                 } else {
-                    document.getElementById('SLAResult').innerHTML = 'Errore durante la rimozione';
+                    alert('Errore durante la rimozione');
                 }
             })
             .catch(error => {
                 console.error('Errore durante la richiesta', error);
-                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+                alert('Si è verificato un errore durante la richiesta');
             });
     }
 
     function MetricState() {
         const formData = new FormData(document.getElementById('SLAForm'));
 
-        fetch('http://localhost:5050/sla_current_state', {
+        fetch('http://localhost:8085/sla_manager/sla_current_state', {
             method: 'POST',
             body: formData
         })
@@ -143,14 +155,14 @@
             })
             .catch(error => {
                 console.error('Errore durante la richiesta', error);
-                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+                alert('Si è verificato un errore durante la richiesta');
             });
     }
 
     function PastViolations() {
         const formData = new FormData(document.getElementById('SLAForm'));
 
-        fetch('http://localhost:5050/sla_current_state', {
+        fetch('http://localhost:8085/sla_manager/sla_current_state', {
             method: 'POST',
             body: formData
         })
@@ -172,8 +184,12 @@
             })
             .catch(error => {
                 console.error('Errore durante la richiesta', error);
-                document.getElementById('SLAResult').innerHTML = 'Si è verificato un errore durante la richiesta';
+                alert('Si è verificato un errore durante la richiesta');
             });
+    }
+
+    function PerformHome(){
+        window.location.href = 'cityevents.html';
     }
 
 </script>

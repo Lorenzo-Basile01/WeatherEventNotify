@@ -1,15 +1,6 @@
-import logging
-
 from kafka import KafkaConsumer
-from flask import Flask
 from telegram import Bot
-import json, asyncio, time, os
-
-#
-# SECRET_KEY = os.urandom(32)
-#
-# app = Flask(name)
-# app.config['SECRET_KEY'] = SECRET_KEY
+import json, asyncio, time, os, logging
 
 telegram_token = '6731451948:AAHNHAVNRG2EI89uGxPE7b0g11v3FZTpadk'
 

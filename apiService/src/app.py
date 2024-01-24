@@ -3,44 +3,29 @@ from models import User, Info_meteo, db
 from kafka import KafkaProducer, KafkaConsumer
 from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Gauge, start_http_server, Counter
-import psutil
-import shutil
-import time
-import requests
-import os
-import json
-import logging
-import threading
-
+import psutil, shutil, time, requests, os, json, logging, threading
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_api/apiDb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+db.init_app(app)
 metrics = PrometheusMetrics(app)
 
-db.init_app(app)
 
-# Crea i Gauge per l'utilizzo della memoria, CPU e il tempo di risposta
 memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentuale')
 cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
-
-# Metrica per lo spazio su disco utilizzato
 disk_space_used = Gauge('disk_space_used', 'Disk space used by the application in bytes')
-
-# Metriche per il conteggio delle connessioni al database
 db_connections_total = Counter('db_connections_total', 'Total number of database connections')
 
 
 def measure_metrics():
     while True:
-        # Misura l'utilizzo della memoria
+
         memory_percent = psutil.virtual_memory().percent
         memory_usage.set(memory_percent)
 
-        # Misura l'utilizzo della CPU
         cpu_percent = psutil.cpu_percent(interval=1)
         cpu_usage.set(cpu_percent)
 
@@ -58,7 +43,6 @@ def consuma_da_kafka():
     while True:
         for key, value in consumer.poll(1.0).items():
             for record in value:
-                # record.value contiene il messaggio come bytes
                 json_message = record.value.decode('utf-8')
                 dictionary_message = json.loads(json_message)
                 logging.error(dictionary_message)
@@ -176,7 +160,5 @@ if __name__ == '__main__':
         db.session.commit()
 
     time.sleep(20)
-
     start_http_server(5002)
-
     loop_execution()
