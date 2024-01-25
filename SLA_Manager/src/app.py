@@ -8,11 +8,17 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 
-app = Flask(__name__)
-
+# Recupera le variabili d'ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY')
+db_user = os.environ.get('MYSQL_USER')
+db_password = os.environ.get('MYSQL_PASSWORD')
+db_name = os.environ.get('MYSQL_DATABASE')
+db_serv_name = os.environ.get('DB_SERV_NAME')
+
+#configurazione app flask
+app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_SLA/slaDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy()
 db.init_app(app)
@@ -41,6 +47,7 @@ class Violation(db.Model):
     sla = relationship('SLA_table', back_populates='violations')
 
 
+#metodo che permette di aggiungere una metrica nel db
 @app.route('/add_metric', methods=['POST'])
 def add_metric():
     if request.method == 'POST':
@@ -56,6 +63,7 @@ def add_metric():
             return jsonify({'message': 0})
 
 
+#metodo che permette di rimuovere una metrica dal db
 @app.route('/remove_metric', methods=['POST'])
 def remove_metric():
     sla = db.session.query(SLA_table).filter((SLA_table.metric_name == request.form['metric_name'])
@@ -100,7 +108,7 @@ def get_sla_status():
 
 
 
-
+#metodo utilizzato per il calcolo delle violazioni nelle ultime 1, 3, 6 ore
 @app.route('/sla_past_violations/', methods=['POST'])
 def get_sla_past_violations():
     sla = SLA_table.query.filter((SLA_table.metric_name == request.form['metric_name'])
@@ -154,6 +162,7 @@ def prometheus_request(metric_name):
         return data
 
 
+#metodo eseguito periodicamente per monitorare le possibili violazioni nel tempo
 def monitor_system_metrics():
     logging.error("MONITORING")
 

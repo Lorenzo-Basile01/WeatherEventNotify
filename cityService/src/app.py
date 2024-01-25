@@ -1,5 +1,4 @@
 from threading import Thread
-
 from flask import Flask, request, jsonify
 from models import User, Info_meteo, db
 from flask_cors import CORS
@@ -9,27 +8,34 @@ from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Counter, Gauge
 import time, os, jwt, logging, json, psutil, shutil, schedule
 
+# Recupera le variabili d'ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY')
+db_user = os.environ.get('MYSQL_USER')
+db_password = os.environ.get('MYSQL_PASSWORD')
+db_name = os.environ.get('MYSQL_DATABASE')
+db_serv_name = os.environ.get('DB_SERV_NAME')
+
+#configurazione app flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_city/cityDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 CORS(app)
 metrics = PrometheusMetrics(app)
 
+#metriche prometheus
 users_city_request_metric = Counter('users_city_request_total', 'Numero totale di richieste a city_serv')
 api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
-db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+db_connections_total = Counter('db_connections_total', 'Numero totale di connessioni al DB')
 memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentuale')
 cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
-disk_space_used = Gauge('disk_space_used', 'Disk space used by the application in bytes')
-
-topic_name = 'weatherInformations'
+disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio in bytes')
 
 
 def send_kafka(message):
+    topic_name = 'weatherInformations'
     producer = KafkaProducer(bootstrap_servers='kafka:9095')
     json_message = json.dumps(message)
     producer.send(topic_name, json_message.encode('utf-8'))
@@ -127,7 +133,6 @@ def measure_metrics():
 
 
 schedule.every(1).minutes.do(measure_metrics)
-
 
 # Funzione per eseguire il job in un thread separato
 def run_scheduler():

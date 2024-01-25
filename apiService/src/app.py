@@ -5,19 +5,27 @@ from prometheus_flask_exporter import PrometheusMetrics
 from prometheus_client import Gauge, start_http_server, Counter
 import psutil, shutil, time, requests, os, json, logging, threading
 
+# Recupera le variabili d'ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY')
+db_user = os.environ.get('MYSQL_USER')
+db_password = os.environ.get('MYSQL_PASSWORD')
+db_name = os.environ.get('MYSQL_DATABASE')
+db_serv_name = os.environ.get('DB_SERV_NAME')
+
+#configurazione app flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@mysql_api/apiDb'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
 metrics = PrometheusMetrics(app)
 
-
+#metriche prometheus
 memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentuale')
 cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
-disk_space_used = Gauge('disk_space_used', 'Disk space used by the application in bytes')
-db_connections_total = Counter('db_connections_total', 'Total number of database connections')
+disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio in bytes')
+db_connections_total = Counter('db_connections_total', 'Numero totale di connessioni al DB')
 
 
 def measure_metrics():
@@ -37,7 +45,6 @@ def measure_metrics():
 
 def consuma_da_kafka():
     topic_name = 'weatherInformations'
-    # time.sleep(10)
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
 
     while True:
@@ -79,8 +86,9 @@ def check_weather():
         with app.app_context():
 
             db_connections_total.inc()
-            users = db.session.query(User).all()
 
+            users = db.session.query(User).all()
+            #cofronto tra i dati sugli eventi richiesti dagli utenti e gli eventi attualmente in atto
             for user in users:
                 db_connections_total.inc()
                 user_city_events = db.session.query(Info_meteo).filter(Info_meteo.user_id == user.id).all()

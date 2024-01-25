@@ -1,11 +1,16 @@
 version: '3'
 
-services:
+networks:
+  mynetwork:
+    driver: bridge
 
+services:
   gateway:
     build:
       context: gateway
       dockerfile: Dockerfile
+    networks:
+      - mynetwork
     container_name: gateway
     ports:
       - 8085:8085
@@ -18,10 +23,12 @@ services:
   mysql_auth:
     image: mysql:8.0
     container_name: mysql_auth
+    networks:
+      - mynetwork
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'authDb'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_auth:/var/lib/mysql
@@ -31,11 +38,13 @@ services:
 
   mysql_city:
     image: mysql:8.0
+    networks:
+      - mynetwork
     container_name: mysql_city
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'cityDb'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_city:/var/lib/mysql
@@ -45,11 +54,13 @@ services:
 
   mysql_api:
     image: mysql:8.0
+    networks:
+      - mynetwork
     container_name: mysql_api
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'apiDb'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_api:/var/lib/mysql
@@ -59,11 +70,13 @@ services:
 
   mysql_SLA:
     image: mysql:8.0
+    networks:
+      - mynetwork
     container_name: mysql_SLA
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'slaDb'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_sla:/var/lib/mysql
@@ -75,10 +88,13 @@ services:
     build:
       context: ./authService
       dockerfile: Dockerfile
+    networks:
+      - mynetwork
     container_name: auth_serv
     environment:
+        DB_SERV_NAME: 'mysql_auth'
         MYSQL_DATABASE: 'users'
-        MYSQL_USER: 'anto'
+        MYSQL_USER: 'root'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
@@ -92,10 +108,13 @@ services:
     build:
       context: ./cityService
       dockerfile: Dockerfile
+    networks:
+      - mynetwork
     container_name: city_serv
     environment:
+        DB_SERV_NAME: 'mysql_city'
         MYSQL_DATABASE: 'users'
-        MYSQL_USER: 'anto'
+        MYSQL_USER: 'root'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
@@ -111,10 +130,13 @@ services:
     build:
       context: ./apiService
       dockerfile: Dockerfile
+    networks:
+      - mynetwork
     container_name: api_serv
     environment:
+      DB_SERV_NAME: 'mysql_api'
       MYSQL_DATABASE: 'users'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'
       SECRET_KEY: "mySecretKey"
@@ -131,6 +153,8 @@ services:
     build:
       context: ./notifyService
       dockerfile: Dockerfile
+    networks:
+      - mynetwork
     container_name: nfy_serv
     ports:
       - 5003:5003
@@ -141,6 +165,8 @@ services:
 
   kafka:
     image: wurstmeister/kafka:latest
+    networks:
+      - mynetwork
     container_name: kafka
     restart: always
     ports:
@@ -159,6 +185,8 @@ services:
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
+    networks:
+      - mynetwork
     container_name: zookeeper
     ports:
       - 2181:2181
@@ -166,6 +194,8 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    networks:
+      - mynetwork
     container_name: prometheus
     ports:
       - "9090:9090"
@@ -186,6 +216,8 @@ services:
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest
+    networks:
+      - mynetwork
     container_name: cadvisor
     ports:
       - "8080:8080"
@@ -197,18 +229,23 @@ services:
 
   node_exporter: # raccolta metriche prestazioni host
     image: prom/node-exporter:latest
+    networks:
+      - mynetwork
     container_name: node_exporter
     ports:
       - "9100:9100"
 
   sla_manager:
     container_name: sla_manager
+    networks:
+      - mynetwork
     build:
       context: ./SLA_Manager
       dockerfile: Dockerfile
     environment:
+      DB_SERV_NAME: 'mysql_SLA'
       MYSQL_DATABASE: 'users'
-      MYSQL_USER: 'anto'
+      MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'
       SECRET_KEY: "mySecretKey"
