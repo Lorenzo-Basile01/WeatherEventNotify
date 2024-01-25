@@ -28,8 +28,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'authDb'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_auth:/var/lib/mysql
     ports:
@@ -44,8 +42,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'cityDb'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_city:/var/lib/mysql
     ports:
@@ -60,8 +56,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'apiDb'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_api:/var/lib/mysql
     ports:
@@ -76,8 +70,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: '12345'
       MYSQL_DATABASE: 'slaDb'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: '12345'
     volumes:
       - ./mysql_volume_sla:/var/lib/mysql
     ports:
@@ -93,7 +85,7 @@ services:
     container_name: auth_serv
     environment:
         DB_SERV_NAME: 'mysql_auth'
-        MYSQL_DATABASE: 'users'
+        MYSQL_DATABASE: 'authDb'
         MYSQL_USER: 'root'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
@@ -113,7 +105,7 @@ services:
     container_name: city_serv
     environment:
         DB_SERV_NAME: 'mysql_city'
-        MYSQL_DATABASE: 'users'
+        MYSQL_DATABASE: 'cityDb'
         MYSQL_USER: 'root'
         MYSQL_PASSWORD: '12345'
         MYSQL_ROOT_PASSWORD: '12345'
@@ -135,7 +127,7 @@ services:
     container_name: api_serv
     environment:
       DB_SERV_NAME: 'mysql_api'
-      MYSQL_DATABASE: 'users'
+      MYSQL_DATABASE: 'apiDb'
       MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'
@@ -185,6 +177,7 @@ services:
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
+    restart: always
     networks:
       - mynetwork
     container_name: zookeeper
@@ -194,6 +187,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    restart: always
     networks:
       - mynetwork
     container_name: prometheus
@@ -216,6 +210,7 @@ services:
 
   cadvisor: # raccolta metriche prestazioni DS
     image: google/cadvisor:latest
+    restart: always
     networks:
       - mynetwork
     container_name: cadvisor
@@ -229,6 +224,7 @@ services:
 
   node_exporter: # raccolta metriche prestazioni host
     image: prom/node-exporter:latest
+    restart: always
     networks:
       - mynetwork
     container_name: node_exporter
@@ -237,6 +233,7 @@ services:
 
   sla_manager:
     container_name: sla_manager
+    restart: always
     networks:
       - mynetwork
     build:
@@ -244,7 +241,7 @@ services:
       dockerfile: Dockerfile
     environment:
       DB_SERV_NAME: 'mysql_SLA'
-      MYSQL_DATABASE: 'users'
+      MYSQL_DATABASE: 'slaDb'
       MYSQL_USER: 'root'
       MYSQL_PASSWORD: '12345'
       MYSQL_ROOT_PASSWORD: '12345'

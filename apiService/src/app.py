@@ -44,6 +44,7 @@ def measure_metrics():
 
 
 def consuma_da_kafka():
+    time.sleep(20)
     topic_name = 'weatherInformations'
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
 
@@ -81,8 +82,9 @@ def send_kafka(message):
 
 def check_weather():
     api_key = 'a5c03ad3d1dedee0979f9ae116dce6ca'
-    time.sleep(20)
+    time.sleep(5)
     while True:
+        time.sleep(20)
         with app.app_context():
 
             db_connections_total.inc()
@@ -146,8 +148,6 @@ def check_weather():
                     }
                     if send:
                         send_kafka(message_payload)
-
-
 
 
 def loop_execution():

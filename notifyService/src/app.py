@@ -15,9 +15,8 @@ async def consuma_da_kafka():
     TOPIC_NAME = 'weatherNotification'
     time.sleep(30)
     consumer = KafkaConsumer(TOPIC_NAME, bootstrap_servers='kafka:9095')
-
     while True:
-        for key, value in consumer.poll(1.0).items():
+        for key, value in consumer.poll(300.0).items():
             for record in value:
                 json_message = record.value.decode('utf-8')
                 dictionary_message = json.loads(json_message)
@@ -25,9 +24,21 @@ async def consuma_da_kafka():
                 await send_t_message(dictionary_message)
 
 async def send_t_message(message):
-    time.sleep(180)
+    logging.error(message)
+
+    rain = False
+    if message['state_r'] == 1:
+        rain = True
+    snow = False
+    if message['state_s'] == 1:
+        snow = True
+
+    min_temperature = int(message['tmin']) if message['tmin'] is not None else None
+    max_temperature = int(message['tmax']) if message['tmax'] is not None else None
+
+    msg = {'City':message['city'], 'Rain': rain, 'Snow': snow, 'min temperature':min_temperature, 'max temperature':max_temperature}
     bot = Bot(token=telegram_token)
-    await bot.send_message(chat_id=message['t_chat_id'], text=message)
+    await bot.send_message(chat_id=message['t_chat_id'], text=msg)
 
 
 def measure_metrics():
