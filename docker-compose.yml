@@ -62,6 +62,20 @@ services:
       - 3308:3306
     restart: always
 
+  mysql_nfy:
+    image: mysql:8.0
+    networks:
+      - mynetwork
+    container_name: mysql_nfy
+    environment:
+      MYSQL_ROOT_PASSWORD: '12345'
+      MYSQL_DATABASE: 'nfyDb'
+    volumes:
+      - ./mysql_volume_nfy:/var/lib/mysql
+    ports:
+      - 3311:3306
+    restart: always
+
   mysql_SLA:
     image: mysql:8.0
     networks:
@@ -148,10 +162,18 @@ services:
     networks:
       - mynetwork
     container_name: nfy_serv
+    environment:
+      DB_SERV_NAME: 'mysql_nfy'
+      MYSQL_DATABASE: 'nfyDb'
+      MYSQL_USER: 'root'
+      MYSQL_PASSWORD: '12345'
+      MYSQL_ROOT_PASSWORD: '12345'
+      SECRET_KEY: "mySecretKey"
     ports:
       - 5003:5003
     restart: always
     depends_on:
+      - mysql_nfy
       - api_serv
       - kafka
 
@@ -215,7 +237,7 @@ services:
       - mynetwork
     container_name: cadvisor
     ports:
-      - "8080:8080"
+      - "8087:8087"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw

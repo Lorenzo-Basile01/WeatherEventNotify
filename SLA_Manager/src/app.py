@@ -34,8 +34,6 @@ class SLA_table(db.Model):
     desired_value = db.Column(db.Float, nullable=False)
     job_name = db.Column(db.String(50), nullable=False)
 
-    violations = relationship('Violation', back_populates='sla')
-
 
 # Definizione del modello delle violazioni
 class Violation(db.Model):
@@ -44,7 +42,7 @@ class Violation(db.Model):
     sla_id = db.Column(db.Integer, db.ForeignKey('sla.id'), nullable=False)
     value = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
-    sla = relationship('SLA_table', back_populates='violations')
+    sla = relationship('SLA_table')
 
 
 #metodo che permette di aggiungere una metrica nel db

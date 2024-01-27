@@ -9,8 +9,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     telegram_chat_id = db.Column(db.Text, nullable=False)
 
-    #info_meteo = relationship('Info_meteo', back_populates='user')
-
 
 class Info_meteo(db.Model):
     __tablename__ = 'info_meteo'
@@ -23,4 +21,4 @@ class Info_meteo(db.Model):
     rain = db.Column(db.Boolean, nullable=True)
     snow = db.Column(db.Boolean, nullable=True)
 
-    user = relationship('User')#, back_populates='info_meteo')
+    user = relationship('User')

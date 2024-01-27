@@ -144,7 +144,8 @@ def check_weather():
                         'state_s': snow,
                         'tmax': t_max,
                         'tmin': t_min,
-                        't_chat_id': user.telegram_chat_id
+                        't_chat_id': user.telegram_chat_id,
+                        'user_id': user.id
                     }
                     if send:
                         send_kafka(message_payload)
