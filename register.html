@@ -95,7 +95,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.state === 0) {
-                    alert('Registrazione avvenuta con successo ${data.token}');
+                    alert('Registrazione avvenuta con successo');
                     var token = data.token;
                     window.location.href = 'cityevents.html?token=' + token;
 
