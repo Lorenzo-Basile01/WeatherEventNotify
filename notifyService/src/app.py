@@ -1,10 +1,9 @@
-from threading import Thread
-from kafka import KafkaConsumer
-from prometheus_client import Gauge, start_http_server
-import telepot
-import json, asyncio, time, os, logging, shutil, psutil, schedule
 from flask import Flask
 from models import User, Info_meteo, db
+from kafka import KafkaConsumer
+from prometheus_client import Gauge, start_http_server
+import json, time, os, logging, shutil, psutil, threading, telepot
+
 
 # Recupera le variabili d'ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -28,7 +27,6 @@ cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
 disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio in bytes')
 
 
-# async
 def consuma_da_kafka():
     TOPIC_NAME = 'weatherNotification'
     consumer = KafkaConsumer(TOPIC_NAME, bootstrap_servers='kafka:9095')
@@ -37,10 +35,11 @@ def consuma_da_kafka():
             for record in value:
                 json_message = record.value.decode('utf-8')
                 dictionary_message = json.loads(json_message)
-                #logging.error(dictionary_message)
+                # logging.error(dictionary_message)
                 with app.app_context():
                     if db.session.query(Info_meteo).filter((Info_meteo.city == dictionary_message['city']) &
-                                                           (Info_meteo.user_id == dictionary_message['user_id'])).first():
+                                                           (Info_meteo.user_id == dictionary_message[
+                                                               'user_id'])).first():
                         continue
                     if not db.session.query(User).filter(User.id == dictionary_message['user_id']).first():
                         user = User(id=dictionary_message['user_id'], telegram_chat_id=dictionary_message['t_chat_id'])
@@ -55,10 +54,8 @@ def consuma_da_kafka():
 
                     db.session.add(info_meteo)
                     db.session.commit()
-                # await send_t_message(dictionary_message)
 
 
-# async
 def send_t_message():
     with app.app_context():
         messages = db.session.query(User, Info_meteo).join(Info_meteo).filter(User.id == Info_meteo.user_id).all()
@@ -84,8 +81,6 @@ def send_t_message():
         bot.sendMessage(chat_id=user.telegram_chat_id, text=msg)
 
 
-# await
-
 def measure_metrics():
     logging.error("NOTIFY_METRICS")
 
@@ -99,21 +94,35 @@ def measure_metrics():
     disk_space_used.set(disk_space.used)
 
 
-schedule.every(1).minutes.do(measure_metrics)
-schedule.every(30).seconds.do(consuma_da_kafka)
-schedule.every(20).seconds.do(send_t_message)
-
-
-# Funzione per eseguire il job in un thread separato
-def run_scheduler():
+def consuma_loop():
     while True:
-        schedule.run_pending()
-        time.sleep(1)
+        consuma_da_kafka()
+        time.sleep(30)
 
 
-# Avvia il thread per eseguire il job in background
-scheduler_thread = Thread(target=run_scheduler)
-scheduler_thread.start()
+def measure_loop():
+    while True:
+        measure_metrics()
+        time.sleep(15)
+
+
+def send_loop():
+    while True:
+        send_t_message()
+        time.sleep(900)
+
+
+def loop_execution():
+    consuma_da_kafka_thread = threading.Thread(target=consuma_loop)
+    measure_metrics_thread = threading.Thread(target=measure_loop)
+    check_weather_thread = threading.Thread(target=send_loop)
+    consuma_da_kafka_thread.start()
+    measure_metrics_thread.start()
+    check_weather_thread.start()
+    consuma_da_kafka_thread.join()
+    measure_metrics_thread.join()
+    check_weather_thread.join()
+
 
 if __name__ == '__main__':
     with app.app_context():
@@ -122,4 +131,5 @@ if __name__ == '__main__':
 
     start_http_server(5003)
 
-    # asyncio.run(consuma_da_kafka())
+    loop_execution()
+

@@ -13,7 +13,9 @@
             flex-direction: column;
         }
 
-        #SLAForm {
+
+
+        #SLAForm, #SLAForm1, #SLAForm2, #SLAForm3{
             background-color: black;
             color: white;
             width: 300px;
@@ -22,6 +24,11 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 5px;
+
+        }
+
+        #title{
+            margin-bottom: 5px;
         }
 
         button {
@@ -42,14 +49,6 @@
             box-sizing: border-box;
         }
 
-        #SLAForm a {
-            display: block;
-            text-align: right;
-            padding: 10px;
-            border: none;
-            text-decoration: none;
-            color: black;
-        }
         .home{
             display: flex;
             justify-content: center;
@@ -61,11 +60,16 @@
             cursor: pointer;
             margin-top: -5px;
         }
+
+        #SLAResult, #SLAResult1{
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <button type="button" class="home" onclick="PerformHome()">Home</button>
     <form id="SLAForm">
+        <div id="title">ADD METRIC</div>
         <label for="metric_name">Metric name:</label>
         <input type="text" id="metric_name" name="metric_name" required>
 
@@ -76,13 +80,43 @@
         <input type="text" id="job_name" name="job_name" required>
 
         <button type="button" onclick="AddMetric()">Add metric</button>
-        <button type="button" onclick="RemoveMetric()">Remove metric</button>
-        <button type="button" onclick="MetricState()">Metric State</button>
-        <button type="button" onclick="PastViolations()">Past violations</button>
         <!-- <button type="button" onclick="FindMetric()">Violation probability</button>-->
-</form>
+    </form>
+    <form id="SLAForm2">
+        <div id="title">METRIC STATE</div>
+        <label for="metric_name">Metric name:</label>
+        <input type="text" id="metric_name" name="metric_name" required>
 
-<div id="SLAResult"></div>
+        <label for="job_name">Job name:</label>
+        <input type="text" id="job_name" name="job_name" required>
+
+        <button type="button" onclick="MetricState()">Metric State</button>
+        <div id="SLAResult"></div>
+    </form>
+    <form id="SLAForm1">
+        <div id="title">REMOVE METRIC</div>
+        <label for="metric_name">Metric name:</label>
+        <input type="text" id="metric_name" name="metric_name" required>
+
+        <label for="job_name">Job name:</label>
+        <input type="text" id="job_name" name="job_name" required>
+
+        <button type="button" onclick="RemoveMetric()">Remove metric</button>
+    </form>
+
+    <form id="SLAForm3">
+        <div id="title">PAST VIOLATIONS</div>
+        <label for="metric_name">Metric name:</label>
+        <input type="text" id="metric_name" name="metric_name" required>
+
+        <label for="job_name">Job name:</label>
+        <input type="text" id="job_name" name="job_name" required>
+
+        <button type="button" onclick="PastViolations()">Past violations</button>
+        <div id="SLAResult1"></div>
+    </form>
+
+
 
 <script>
     function AddMetric() {
@@ -109,7 +143,7 @@
     }
 
     function RemoveMetric() {
-        const formData = new FormData(document.getElementById('SLAForm'));
+        const formData = new FormData(document.getElementById('SLAForm1'));
 
         fetch('http://localhost:8085/sla_manager/remove_metric', {
             method: 'POST',
@@ -131,7 +165,7 @@
     }
 
     function MetricState() {
-        const formData = new FormData(document.getElementById('SLAForm'));
+        const formData = new FormData(document.getElementById('SLAForm2'));
 
         fetch('http://localhost:8085/sla_manager/sla_current_state', {
             method: 'POST',
@@ -163,7 +197,7 @@
     }
 
     function PastViolations() {
-        const formData = new FormData(document.getElementById('SLAForm'));
+        const formData = new FormData(document.getElementById('SLAForm3'));
 
         fetch('http://localhost:8085/sla_manager/sla_past_violations', {
             method: 'POST',
@@ -180,9 +214,9 @@
                         "<li>" + "violations count last 3 hours: " + data.violations_count_last_3_hours + "</li>" +
                         "<li>" + "violations count last 6 hours: " + data.violations_count_last_6_hours + "</li>" +
                         "</ul>";
-                    document.getElementById('SLAResult').innerHTML = listaHTML;
+                    document.getElementById('SLAResult1').innerHTML = listaHTML;
                 } else {
-                    document.getElementById('SLAResult').innerHTML = 'Metrica non presente nel contratto';
+                    document.getElementById('SLAResult1').innerHTML = 'Metrica non presente nel contratto';
                 }
             })
             .catch(error => {
