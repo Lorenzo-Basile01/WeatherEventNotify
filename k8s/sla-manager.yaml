@@ -34,19 +34,19 @@ spec:
     spec:
       containers:
         - name: sla-container
-          image: al3gr/microuser:1.0
+          image: lorenzo071/sla_serv:1.0
           ports:
             - containerPort: 5050
             - containerPort: 9000
           env:
             - name: DB_SERV_NAME
-              value: 'mysql_SLA'
+              value: 'sladb'
             - name: MYSQL_DATABASE
-              value: 'slaDb'
+              value: 'sladb'
             - name: MYSQL_USER
               value: 'root'
             - name: MYSQL_PASSWORD
-              value: 12345'
+              value: '12345'
             - name: MYSQL_ROOT_PASSWORD
               value: '12345'
             - name: SECRET_KEY

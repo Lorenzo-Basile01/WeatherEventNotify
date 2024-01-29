@@ -1,30 +1,35 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: apiDb
+  name: apidb
   namespace: ds
 spec:
-  serviceName: "apiDb"
+  serviceName: "apidb"
   replicas: 1
   selector:
     matchLabels:
-      app: apiDb
+      app: apidb
   template:
     metadata:
       labels:
-        app: apiDb
+        app: apidb
     spec:
       containers:
-        - name: apiDb
-          image: al3gr/photodb:1.0
+        - name: apidb
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: '12345'
+            - name: MYSQL_DATABASE
+              value: 'apidb'
           ports:
             - containerPort: 3306
           volumeMounts:
-            - name: mysql_volume_api
+            - name: mysql-volume-api
               mountPath: /var/lib/mysql
   volumeClaimTemplates:
     - metadata:
-        name: mysql_volume_api
+        name: mysql-volume-api
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
@@ -36,11 +41,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: apiDb
+  name: apidb
   namespace: ds
 spec:
   selector:
-    app: apiDb
+    app: apidb
   ports:
     - protocol: TCP
       port: 3306

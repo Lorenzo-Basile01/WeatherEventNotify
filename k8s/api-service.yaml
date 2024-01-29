@@ -20,7 +20,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: city-deploy
+  name: api-deploy
   namespace: ds
 spec:
   replicas: 1
@@ -34,19 +34,19 @@ spec:
     spec:
       containers:
         - name: api-container
-          image: al3gr/microuser:1.0
+          image: lorenzo071/api_serv:1.0
           ports:
             - containerPort: 5002
             - containerPort: 9000
           env:
             - name: DB_SERV_NAME
-              value: 'mysql_api'
+              value: 'apidb'
             - name: MYSQL_DATABASE
-              value: 'apiDb'
+              value: 'apidb'
             - name: MYSQL_USER
               value: 'root'
             - name: MYSQL_PASSWORD
-              value: 12345'
+              value: '12345'
             - name: MYSQL_ROOT_PASSWORD
               value: '12345'
             - name: SECRET_KEY

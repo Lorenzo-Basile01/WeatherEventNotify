@@ -1,30 +1,35 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: nfyDb
+  name: nfydb
   namespace: ds
 spec:
-  serviceName: "nfyDb"
+  serviceName: "nfydb"
   replicas: 1
   selector:
     matchLabels:
-      app: nfyDb
+      app: nfydb
   template:
     metadata:
       labels:
-        app: nfyDb
+        app: nfydb
     spec:
       containers:
-        - name: nfyDb
-          image: al3gr/photodb:1.0
+        - name: nfydb
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: '12345'
+            - name: MYSQL_DATABASE
+              value: 'nfydb'
           ports:
             - containerPort: 3306
           volumeMounts:
-            - name: mysql_volume_nfy
+            - name: mysql-volume-nfy
               mountPath: /var/lib/mysql
   volumeClaimTemplates:
     - metadata:
-        name: mysql_volume_nfy
+        name: mysql-volume-nfy
       spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
@@ -36,11 +41,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nfyDb
+  name: nfydb
   namespace: ds
 spec:
   selector:
-    app: nfyDb
+    app: nfydb
   ports:
     - protocol: TCP
       port: 3306
