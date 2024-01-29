@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-conf
+  namespace: ds
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:   
+    - job_name: 'auth-service'
+      static_configs:
+        - targets: ['auth-service:5000']
+
+    - job_name: 'city-service'
+      static_configs:
+        - targets: ['city-service:5001']
+
+    - job_name: 'api-service'
+      static_configs:
+        - targets: ['api-service:5002']
+
+    - job_name: 'nfy-service'
+      static_configs:
+        - targets: ['nfy-service:5003']
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+  namespace: ds
+spec:
+  serviceName: "prometheus-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - args:
+            - --config.file=/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --web.console.libraries=/etc/prometheus/console_libraries
+            - --web.console.templates=/etc/prometheus/consoles
+          name: prometheus
+          image: prom/prometheus
+          ports:
+            - containerPort: 9090
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/prometheus
+      volumes:
+        - name: config-volume
+          configMap:
+            name: prometheus-conf
+            defaultMode: 420
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: ds
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cityDb
+  namespace: ds
+spec:
+  serviceName: "cityDb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cityDb
+  template:
+    metadata:
+      labels:
+        app: cityDb
+    spec:
+      containers:
+        - name: cityDb
+          image: al3gr/photodb:1.0
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql_volume_city
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql_volume_city
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cityDb
+  namespace: ds
+spec:
+  selector:
+    app: cityDb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306

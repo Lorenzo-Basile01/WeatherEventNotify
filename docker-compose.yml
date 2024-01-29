@@ -218,10 +218,12 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/etc/prometheus/console_libraries"
-      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--config.file=/etc/prometheus/prometheus.yml" #percorso file configurazione
+      - "--storage.tsdb.path=/prometheus" #Questa opzione imposta il percorso in cui Prometheus memorizzerà i dati
+          # a series temporali (TSDB, Time Series Database). Il TSDB è il motore di archiviazione utilizzato da
+          # Prometheus per mantenere i dati storici e consentire query temporali efficienti.
+      - "--web.console.libraries=/etc/prometheus/console_libraries" #javascript per interfaccia utente
+      - "--web.console.templates=/etc/prometheus/consoles" # imposta percorso dei template della console (UI)
     depends_on:
       - cadvisor
       - node_exporter

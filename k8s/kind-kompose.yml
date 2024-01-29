@@ -1,0 +1,1060 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: api-serv
+  name: api-serv
+spec:
+  ports:
+    - name: "5002"
+      port: 5002
+      targetPort: 5002
+  selector:
+    io.kompose.service: api-serv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: auth-serv
+  name: auth-serv
+spec:
+  ports:
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+  selector:
+    io.kompose.service: auth-serv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: cadvisor
+  name: cadvisor
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: cadvisor
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: city-serv
+  name: city-serv
+spec:
+  ports:
+    - name: "5001"
+      port: 5001
+      targetPort: 5001
+  selector:
+    io.kompose.service: city-serv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: gateway
+  name: gateway
+spec:
+  ports:
+    - name: "8085"
+      port: 8085
+      targetPort: 8085
+  selector:
+    io.kompose.service: gateway
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    app: kafka-broker
+  name: kafka-broker
+spec:
+  ports:
+    - name: "9095"
+      port: 9095
+      targetPort: 9095
+    - name: "9096"
+      port: 9096
+      targetPort: 9096
+  selector:
+    app: kafka-broker
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-api
+  name: mysql-api
+spec:
+  ports:
+    - name: "3308"
+      port: 3308
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysql-api
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-auth
+  name: mysql-auth
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysql-auth
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-city
+  name: mysql-city
+spec:
+  ports:
+    - name: "3307"
+      port: 3307
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysql-city
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-sla
+  name: mysql-sla
+spec:
+  ports:
+    - name: "3310"
+      port: 3310
+      targetPort: 3306
+  selector:
+    io.kompose.service: mysql-sla
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: nfy-serv
+  name: nfy-serv
+spec:
+  ports:
+    - name: "5003"
+      port: 5003
+      targetPort: 5003
+  selector:
+    io.kompose.service: nfy-serv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: node-exporter
+  name: node-exporter
+spec:
+  ports:
+    - name: "9100"
+      port: 9100
+      targetPort: 9100
+  selector:
+    io.kompose.service: node-exporter
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: prometheus
+  name: prometheus
+spec:
+  ports:
+    - name: "9090"
+      port: 9090
+      targetPort: 9090
+  selector:
+    io.kompose.service: prometheus
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: sla-manager
+  name: sla-manager
+spec:
+  ports:
+    - name: "5050"
+      port: 5050
+      targetPort: 5050
+  selector:
+    io.kompose.service: sla-manager
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: zookeeper
+  name: zookeeper
+spec:
+  ports:
+    - name: "2181"
+      port: 2181
+      targetPort: 2181
+  selector:
+    io.kompose.service: zookeeper
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: api-serv
+  name: api-serv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api-serv
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: api-serv
+    spec:
+      containers:
+        - env:
+            - name: DB_SERV_NAME
+              value: mysql_api
+            - name: MYSQL_DATABASE
+              value: apiDb
+            - name: MYSQL_PASSWORD
+              value: "12345"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+            - name: MYSQL_USER
+              value: root
+            - name: SECRET_KEY
+              value: mySecretKey
+          image: api-serv
+          name: api-serv
+          ports:
+            - containerPort: 5002
+              hostPort: 5002
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: auth-serv
+  name: auth-serv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: auth-serv
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: auth-serv
+    spec:
+      containers:
+        - env:
+            - name: DB_SERV_NAME
+              value: mysql_auth
+            - name: MYSQL_DATABASE
+              value: authDb
+            - name: MYSQL_PASSWORD
+              value: "12345"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+            - name: MYSQL_USER
+              value: root
+            - name: SECRET_KEY
+              value: mySecretKey
+          image: auth-serv
+          name: auth-serv
+          ports:
+            - containerPort: 5000
+              hostPort: 5000
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: cadvisor
+  name: cadvisor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: cadvisor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: cadvisor
+    spec:
+      containers:
+        - image: google/cadvisor:latest
+          name: cadvisor
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /rootfs
+              name: cadvisor-claim0
+              readOnly: true
+            - mountPath: /var/run
+              name: cadvisor-claim1
+            - mountPath: /sys
+              name: cadvisor-claim2
+              readOnly: true
+            - mountPath: /var/lib/docker
+              name: cadvisor-claim3
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: cadvisor-claim0
+          persistentVolumeClaim:
+            claimName: cadvisor-claim0
+            readOnly: true
+        - name: cadvisor-claim1
+          persistentVolumeClaim:
+            claimName: cadvisor-claim1
+        - name: cadvisor-claim2
+          persistentVolumeClaim:
+            claimName: cadvisor-claim2
+            readOnly: true
+        - name: cadvisor-claim3
+          persistentVolumeClaim:
+            claimName: cadvisor-claim3
+            readOnly: true
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: cadvisor-claim0
+  name: cadvisor-claim0
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: cadvisor-claim1
+  name: cadvisor-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: cadvisor-claim2
+  name: cadvisor-claim2
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: cadvisor-claim3
+  name: cadvisor-claim3
+spec:
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: city-serv
+  name: city-serv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: city-serv
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: city-serv
+    spec:
+      containers:
+        - env:
+            - name: DB_SERV_NAME
+              value: mysql_city
+            - name: MYSQL_DATABASE
+              value: cityDb
+            - name: MYSQL_PASSWORD
+              value: "12345"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+            - name: MYSQL_USER
+              value: root
+            - name: SECRET_KEY
+              value: mySecretKey
+          image: city-serv
+          name: city-serv
+          ports:
+            - containerPort: 5001
+              hostPort: 5001
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: gateway
+  name: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: gateway
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: gateway
+    spec:
+      containers:
+        - image: gateway
+          name: gateway
+          ports:
+            - containerPort: 8085
+              hostPort: 8085
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    app: kafka-broker
+  name: kafka-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-broker
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        app: kafka-broker
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: 'INSIDE://kafka-broker:9095, OUTSIDE://:9096'
+            - name: KAFKA_CREATE_TOPICS
+              value: 'weatherNotification:1:1,weatherInformations:1:1'
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: 'INSIDE'
+            - name: KAFKA_LISTENERS
+              value: 'INSIDE://:9095, OUTSIDE://:9096'
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: 'INSIDE:PLAINTEXT, OUTSIDE:PLAINTEXT'
+            - name: KAFKA_MESSAGE_MAX_BYTES
+              value: "2000000000"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: 'zookeeper:2181'
+          image: wurstmeister/kafka:latest
+          name: kafka-broker
+          ports:
+            - containerPort: 9095
+            - containerPort: 9096
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-api
+  name: mysql-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: mysql-api
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: apiDb
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+          image: mysql:8.0
+          name: mysql-api
+          ports:
+            - containerPort: 3306
+              hostPort: 3308
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-api-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mysql-api-claim0
+          persistentVolumeClaim:
+            claimName: mysql-api-claim0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mysql-api-claim0
+  name: mysql-api-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-auth
+  name: mysql-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-auth
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: mysql-auth
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: authDb
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+          image: mysql:8.0
+          name: mysql-auth
+          ports:
+            - containerPort: 3306
+              hostPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-auth-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mysql-auth-claim0
+          persistentVolumeClaim:
+            claimName: mysql-auth-claim0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mysql-auth-claim0
+  name: mysql-auth-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-city
+  name: mysql-city
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-city
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: mysql-city
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: cityDb
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+          image: mysql:8.0
+          name: mysql-city
+          ports:
+            - containerPort: 3306
+              hostPort: 3307
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-city-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mysql-city-claim0
+          persistentVolumeClaim:
+            claimName: mysql-city-claim0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mysql-city-claim0
+  name: mysql-city-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: mysql-sla
+  name: mysql-sla
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mysql-sla
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: mysql-sla
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              value: slaDb
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+          image: mysql:8.0
+          name: mysql-sla
+          ports:
+            - containerPort: 3306
+              hostPort: 3310
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-sla-claim0
+      restartPolicy: Always
+      volumes:
+        - name: mysql-sla-claim0
+          persistentVolumeClaim:
+            claimName: mysql-sla-claim0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: mysql-sla-claim0
+  name: mysql-sla-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: nfy-serv
+  name: nfy-serv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: nfy-serv
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: nfy-serv
+    spec:
+      containers:
+        - image: nfy-serv
+          name: nfy-serv
+          ports:
+            - containerPort: 5003
+              hostPort: 5003
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: node-exporter
+  name: node-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: node-exporter
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: node-exporter
+    spec:
+      containers:
+        - image: prom/node-exporter:latest
+          name: node-exporter
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: prometheus
+  name: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: prometheus
+    spec:
+      containers:
+        - args:
+            - --config.file=/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --web.console.libraries=/etc/prometheus/console_libraries
+            - --web.console.templates=/etc/prometheus/consoles
+          image: prom/prometheus:latest
+          name: prometheus
+          ports:
+            - containerPort: 9090
+              hostPort: 9090
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/prometheus
+              name: prometheus-claim0
+      restartPolicy: Always
+      volumes:
+        - name: prometheus-claim0
+          persistentVolumeClaim:
+            claimName: prometheus-claim0
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: prometheus-claim0
+  name: prometheus-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: sla-manager
+  name: sla-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sla-manager
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: sla-manager
+    spec:
+      containers:
+        - env:
+            - name: DB_SERV_NAME
+              value: mysql_SLA
+            - name: MYSQL_DATABASE
+              value: slaDb
+            - name: MYSQL_PASSWORD
+              value: "12345"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "12345"
+            - name: MYSQL_USER
+              value: root
+            - name: SECRET_KEY
+              value: mySecretKey
+          image: sla-manager
+          name: sla-manager
+          ports:
+            - containerPort: 5050
+              hostPort: 5050
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert -o docker-compose.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: zookeeper
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: zookeeper
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert -o docker-compose.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/weathereventnotify-mynetwork: "true"
+        io.kompose.service: zookeeper
+    spec:
+      containers:
+        - image: wurstmeister/zookeeper:latest
+          name: zookeeper
+          ports:
+            - containerPort: 2181
+              hostPort: 2181
+              protocol: TCP
+      restartPolicy: Always
+

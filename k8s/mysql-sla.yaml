@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: slaDb
+  namespace: ds
+spec:
+  serviceName: "slaDb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slaDb
+  template:
+    metadata:
+      labels:
+        app: slaDb
+    spec:
+      containers:
+        - name: slaDb
+          image: al3gr/photodb:1.0
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql_volume_sla
+              mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql_volume_sla
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: slaDb
+  namespace: ds
+spec:
+  selector:
+    app: slaDb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
