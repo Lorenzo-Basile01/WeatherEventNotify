@@ -49,8 +49,8 @@ spec:
         network/kafka-network: "true"
         app: kafka
     spec:
-#      nodeSelector:
-#        custom-label: "worker"
+      nodeSelector:
+        custom-label: "worker"
       enableServiceLinks: false
       containers:
         - name: kafka
@@ -61,9 +61,11 @@ spec:
             - containerPort: 9096
           env:
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: 'INSIDE://kafka-broker:9095, OUTSIDE://:9096'
+              value: 'INSIDE://kafka:9095, OUTSIDE://:9096'
             - name: KAFKA_CREATE_TOPICS
               value: 'weatherNotification:1:1,weatherInformations:1:1'
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
             - name: KAFKA_INTER_BROKER_LISTENER_NAME
               value: 'INSIDE'
             - name: KAFKA_LISTENERS

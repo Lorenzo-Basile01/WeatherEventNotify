@@ -88,7 +88,7 @@
         formData.append('telegramChatId', telegramChatId);
         formData.append('password', password);
 
-        fetch('http://localhost:8085/auth/register', {
+        fetch('http://localhost:80/auth/register', {
             method: 'POST',
             body: formData
         })

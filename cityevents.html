@@ -98,7 +98,7 @@
     // Verifica il valore effettivo della checkbox "snow" e imposta true/false
     formData.set('snow', document.getElementById('snow').checked === true ? 1 : 0);
 
-    fetch('http://localhost:8085/city_serv/cityevents/' + encodeURIComponent(token), {
+    fetch('http://localhost:80/city_serv/cityevents/' + encodeURIComponent(token), {
       method: 'POST',
       body: formData
     })

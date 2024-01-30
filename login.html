@@ -68,7 +68,7 @@
     function performLogin() {
         const formData = new FormData(document.getElementById('loginForm'));
 
-        fetch('http://localhost:8085/auth/login', {
+        fetch('http://localhost:80/auth/login', {
             method: 'POST',
             body: formData
         })

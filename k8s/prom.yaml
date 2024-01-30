@@ -30,11 +30,11 @@ metadata:
   name: prometheus
   namespace: ds
 spec:
-  serviceName: "prometheus-service"
+  serviceName: "prometheus"
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus
+      app: prometheus #serve a selezionare tutti i label che con chiave app e valore prometheus
   template:
     metadata:
       labels:
@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - args:
-            - --config.file=/etc/prometheus.yml
+            - --config.file=/etc/prometheus/prometheus.yml
             - --storage.tsdb.path=/prometheus
             - --web.console.libraries=/etc/prometheus/console_libraries
             - --web.console.templates=/etc/prometheus/consoles
@@ -50,21 +50,22 @@ spec:
           image: prom/prometheus
           ports:
             - containerPort: 9090
-          volumeMounts:
+          volumeMounts: #percorsi nel container dove sono montati i volumi
             - name: config-volume
               mountPath: /etc/prometheus
       volumes:
         - name: config-volume
-          configMap:
+          configMap: #configMap:: Specifica che il tipo di volume è un ConfigMap. In questo caso, il volume config-volume sarà popolato con i dati della ConfigMap specificata.
             name: prometheus-conf
-            defaultMode: 420
+            defaultMode: 420 #permessi di lettura
+      #In molti casi, un volume viene dichiarato nella sezione volumes del pod e poi montato in uno o più contenitori utilizzando volumeMounts.
 
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service
+  name: prometheus
   namespace: ds
 spec:
   selector:

@@ -122,7 +122,7 @@
     function AddMetric() {
         const formData = new FormData(document.getElementById('SLAForm'));
 
-        fetch('http://localhost:8085/sla_manager/add_metric', {
+        fetch('http://localhost:80/sla_manager/add_metric', {
             method: 'POST',
             body: formData
         })
@@ -145,7 +145,7 @@
     function RemoveMetric() {
         const formData = new FormData(document.getElementById('SLAForm1'));
 
-        fetch('http://localhost:8085/sla_manager/remove_metric', {
+        fetch('http://localhost:80/sla_manager/remove_metric', {
             method: 'POST',
             body: formData
         })
@@ -167,7 +167,7 @@
     function MetricState() {
         const formData = new FormData(document.getElementById('SLAForm2'));
 
-        fetch('http://localhost:8085/sla_manager/sla_current_state', {
+        fetch('http://localhost:80/sla_manager/sla_current_state', {
             method: 'POST',
             body: formData
         })
@@ -199,7 +199,7 @@
     function PastViolations() {
         const formData = new FormData(document.getElementById('SLAForm3'));
 
-        fetch('http://localhost:8085/sla_manager/sla_past_violations', {
+        fetch('http://localhost:80/sla_manager/sla_past_violations', {
             method: 'POST',
             body: formData
         })

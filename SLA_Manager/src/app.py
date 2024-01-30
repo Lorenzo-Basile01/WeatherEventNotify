@@ -107,7 +107,7 @@ def get_sla_status():
 
 
 #metodo utilizzato per il calcolo delle violazioni nelle ultime 1, 3, 6 ore
-@app.route('/sla_past_violations/', methods=['POST'])
+@app.route('/sla_past_violations', methods=['POST'])
 def get_sla_past_violations():
     sla = SLA_table.query.filter((SLA_table.metric_name == request.form['metric_name'])
                                  & (SLA_table.job_name == request.form['job_name'])).first()
@@ -197,12 +197,15 @@ scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
 
 
-@app.before_request
-def init_db():
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
+# @app.before_request
+# def init_db():
+#     with app.app_context():
+#         db.create_all()
+#         db.session.commit()
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     app.run()
