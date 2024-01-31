@@ -2,8 +2,9 @@ ISTRUZIONI PER BUILD & DEPLOYMENT
 
 CONFIGURAZIONE TELEGRAM BOT
 Per poter ricevere le notifiche in modo corretto è necessaria la configurazione di un telegram bot.
-Avvia una chat con il bot @BotFather su Telegram.
-Segui le istruzioni per creare un nuovo bot e ottenere il token del bot.
+come primo passo bisogna recuperare il telegram chat id, bisogna accedere al bot @get_id_bot e inserire il comando /start.
+Tale id andrà inserito durante l'autenticazione.
+Avvia una chat con il bot all' id @WeatherEventBot su Telegram. I messaggi arriveranno nella chat di quest'ultimo.
 
 
 DOCKER

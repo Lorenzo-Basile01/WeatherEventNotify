@@ -36,6 +36,11 @@ disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio 
 
 @app.route("/register", methods=['POST'])
 def user_register():
+
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     if request.method == 'POST':
         if request.form['username'] == '' or request.form['password'] == '' or request.form['telegramChatId'] == '':
             return jsonify({'state': 1})
@@ -60,6 +65,11 @@ def user_register():
 
 @app.route("/login", methods=['POST'])
 def user_login():
+
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -137,8 +147,5 @@ scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
 
     app.run()

@@ -48,6 +48,10 @@ def consuma_da_kafka():
     topic_name = 'weatherInformations'
     consumer = KafkaConsumer(topic_name, bootstrap_servers='kafka:9095')
 
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     while True:
         for key, value in consumer.poll(1.0).items():
             for record in value:

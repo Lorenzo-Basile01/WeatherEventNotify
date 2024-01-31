@@ -30,6 +30,11 @@ disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio 
 def consuma_da_kafka():
     TOPIC_NAME = 'weatherNotification'
     consumer = KafkaConsumer(TOPIC_NAME, bootstrap_servers='kafka:9095')
+
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     while True:
         for key, value in consumer.poll(300.0).items():
             for record in value:
@@ -56,7 +61,11 @@ def consuma_da_kafka():
 
 
 def send_t_message():
+
     with app.app_context():
+        db.create_all()
+        db.session.commit()
+
         messages = db.session.query(User, Info_meteo).join(Info_meteo).filter(User.id == Info_meteo.user_id).all()
     logging.error(messages)
     for user, info in messages:

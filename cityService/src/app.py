@@ -43,15 +43,13 @@ def send_kafka(message):
     producer.flush()
 
 
-@app.before_request
-def init_db():
+@app.route('/cityevents/<token>', methods=['POST'])
+def home(token):
+
     with app.app_context():
         db.create_all()
         db.session.commit()
 
-
-@app.route('/cityevents/<token>', methods=['POST'])
-def home(token):
     request_start_time = time.time()
 
     users_city_request_metric.inc()
@@ -147,7 +145,5 @@ scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
+
     app.run()

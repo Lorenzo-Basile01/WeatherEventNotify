@@ -1,9 +1,7 @@
-import string
 import time, requests, os
 from datetime import datetime, timedelta
 import logging
 from threading import Thread
-from urllib.parse import quote
 from flask_cors import CORS
 import schedule
 from flask import Flask, request, jsonify
@@ -52,6 +50,10 @@ class Violation(db.Model):
 # metodo che permette di aggiungere una metrica nel db
 @app.route('/add_metric', methods=['POST'])
 def add_metric():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     if request.method == 'POST':
         if db.session.query(SLA_table).filter((SLA_table.metric_name == request.form['metric_name'])
                                               & (SLA_table.job_name == request.form['job_name'])).first():
@@ -68,6 +70,9 @@ def add_metric():
 # metodo che permette di rimuovere una metrica dal db
 @app.route('/remove_metric', methods=['POST'])
 def remove_metric():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     sla = db.session.query(SLA_table).filter((SLA_table.metric_name == request.form['metric_name'])
                                              & (SLA_table.job_name == request.form['job_name'])).first()
 
@@ -86,6 +91,9 @@ def remove_metric():
 # API per la query dello stato del SLA
 @app.route('/sla_current_state', methods=['POST'])
 def get_sla_status():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     sla = SLA_table.query.filter((SLA_table.metric_name == request.form['metric_name'])
                                  & (SLA_table.job_name == request.form['job_name'])).first()
 
@@ -112,6 +120,9 @@ def get_sla_status():
 # metodo utilizzato per il calcolo delle violazioni nelle ultime 1, 3, 6 ore
 @app.route('/sla_past_violations', methods=['POST'])
 def get_sla_past_violations():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     sla = SLA_table.query.filter((SLA_table.metric_name == request.form['metric_name'])
                                  & (SLA_table.job_name == request.form['job_name'])).first()
 
@@ -164,6 +175,9 @@ def prometheus_request(metric_name):
 
 # metodo eseguito periodicamente per monitorare le possibili violazioni nel tempo
 def monitor_system_metrics():
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     logging.error("MONITORING")
 
     with app.app_context():
@@ -263,7 +277,5 @@ scheduler_thread.start()
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
+
     app.run()
