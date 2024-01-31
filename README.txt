@@ -21,9 +21,9 @@ per deployare il progetto su kebernates bisogna:
 3)Eseguire il comando:
  	kubectl create namespace ds
  per creare il namespace.
-4)Pullare le immagini nel proprio docker-hub, questo può essere fatto attraverso i comandi "docker login" per loggari al proprio docker-hub e poi è     possibile eseguire:
-	docker tag <Image ID> <cartella-docker-hub>/<docker-image-tag>
-dopo questo può essere fatto 
+4)Pushare le immagini nel proprio docker-hub, questo può essere fatto attraverso i comandi "docker login" per loggarsi al proprio docker-hub e poi è possibile eseguire:
+	docker tag <Image ID> <cartella-docker-hub>/<docker-image-tag>:<tag>
+dopo questo può essere fatto
 	docker push  <cartella-docker-hub>/<docker-image-tag>
 5)In seguito bisogna effettuare il deploy dei microservizi col seguente comando: 'kubectl apply -f file.yaml', nel seguente ordine:
 
