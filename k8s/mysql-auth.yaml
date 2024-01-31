@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: StatefulSet #Un StatefulSet è un oggetto di Kubernetes che gestisce l'applicazione di tipo stato, come database, che richiedono identità persistente e accesso stabile ai dischi.
+kind: StatefulSet
 metadata:
   name: authdb
   namespace: ds
@@ -23,7 +23,7 @@ spec:
             - name: MYSQL_DATABASE
               value: 'authdb'
           ports:
-            - containerPort: 3306 #porta a destra del comopose
+            - containerPort: 3306
           volumeMounts:
             - name: mysql-volume-auth
               mountPath: /var/lib/mysql
@@ -31,7 +31,7 @@ spec:
     - metadata:
         name: mysql-volume-auth
       spec:
-        accessModes: [ "ReadWriteOnce" ] #Questo specifica le modalità di accesso per il PersistentVolumeClaim. In questo caso, è impostato su "ReadWriteOnce", il che significa che il volume può essere montato in lettura/scrittura da un singolo nodo
+        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: 100Mi

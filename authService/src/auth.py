@@ -13,7 +13,7 @@ db_password = os.environ.get('MYSQL_PASSWORD')
 db_name = os.environ.get('MYSQL_DATABASE')
 db_serv_name = os.environ.get('DB_SERV_NAME')
 
-#configurazione app flask
+# configurazione app flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
@@ -25,7 +25,7 @@ invalid_tokens = []  # Lista per memorizzare i token invalidati
 
 metrics = PrometheusMetrics(app)
 
-#metriche prometheus
+# metriche prometheus
 registered_users_metric = Counter('registered_users_total', 'Numero totale di utenti registrati')
 logged_users_metric = Counter('logged_users_total', 'Numero totale di utenti loggati')
 db_connections_total = Counter('db_connections_total', 'Numero totale di connessioni al DB')
@@ -33,11 +33,6 @@ memory_usage = Gauge('memory_usage_percent', 'Utilizzo della memoria in percentu
 cpu_usage = Gauge('cpu_usage_percent', 'Utilizzo della CPU in percentuale')
 disk_space_used = Gauge('disk_space_used', 'Spazio del disco usato dal servizio in bytes')
 
-@app.before_request
-def init_db():
-    with app.app_context():
-        db.create_all()
-        db.session.commit()
 
 @app.route("/register", methods=['POST'])
 def user_register():
@@ -115,7 +110,6 @@ def user_logout():
 
 
 def measure_metrics():
-
     logging.error("AUTH_METRICS")
 
     memory_percent = psutil.virtual_memory().percent
@@ -142,6 +136,9 @@ def run_scheduler():
 scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
 
-
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
+
     app.run()

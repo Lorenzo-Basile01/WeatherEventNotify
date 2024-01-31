@@ -125,7 +125,7 @@
       const formData = new FormData();
       formData.append('token', token);
 
-      fetch('http://localhost:8085/auth/logout', {
+      fetch('http://localhost:80/auth/logout', {
           method: 'POST',
           body: formData
       })

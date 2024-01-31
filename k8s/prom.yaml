@@ -34,7 +34,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: prometheus #serve a selezionare tutti i label che con chiave app e valore prometheus
+      app: prometheus
   template:
     metadata:
       labels:
@@ -50,15 +50,14 @@ spec:
           image: prom/prometheus
           ports:
             - containerPort: 9090
-          volumeMounts: #percorsi nel container dove sono montati i volumi
+          volumeMounts:
             - name: config-volume
               mountPath: /etc/prometheus
       volumes:
         - name: config-volume
-          configMap: #configMap:: Specifica che il tipo di volume è un ConfigMap. In questo caso, il volume config-volume sarà popolato con i dati della ConfigMap specificata.
+          configMap:
             name: prometheus-conf
-            defaultMode: 420 #permessi di lettura
-      #In molti casi, un volume viene dichiarato nella sezione volumes del pod e poi montato in uno o più contenitori utilizzando volumeMounts.
+            defaultMode: 420
 
 
 ---

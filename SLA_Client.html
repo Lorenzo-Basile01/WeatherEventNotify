@@ -13,9 +13,7 @@
             flex-direction: column;
         }
 
-
-
-        #SLAForm, #SLAForm1, #SLAForm2, #SLAForm3{
+        #SLAForm, #SLAForm1, #SLAForm2, #SLAForm3, #SLAForm4{
             background-color: black;
             color: white;
             width: 300px;
@@ -73,14 +71,13 @@
         <label for="metric_name">Metric name:</label>
         <input type="text" id="metric_name" name="metric_name" required>
 
-        <label for="desired_value">Desidered Value:</label>
+        <label for="desired_value">Desired Value:</label>
         <input type="text" id="desired_value" name="desired_value" required>
 
         <label for="job_name">Job name:</label>
         <input type="text" id="job_name" name="job_name" required>
 
         <button type="button" onclick="AddMetric()">Add metric</button>
-        <!-- <button type="button" onclick="FindMetric()">Violation probability</button>-->
     </form>
     <form id="SLAForm2">
         <div id="title">METRIC STATE</div>
@@ -116,7 +113,23 @@
         <div id="SLAResult1"></div>
     </form>
 
+    <form id="SLAForm4">
+        <div id="title">VIOLATIONS PROBABILITY</div>
+        <label for="metric_name">Metric name:</label>
+        <input type="text" id="metric_name" name="metric_name" required>
 
+        <label for="job_name">Job name:</label>
+        <input type="text" id="job_name" name="job_name" required>
+
+        <label for="desired_value">Desired Value:</label>
+        <input type="text" id="desired_value" name="desired_value" required>
+
+        <label for="minutes">Minutes:</label>
+        <input type="text" id="minutes" name="minutes" required>
+
+        <button type="button" onclick="ViolationsProbability()">violation probability</button>
+        <div id="SLAResult2"></div>
+    </form>
 
 <script>
     function AddMetric() {
@@ -217,6 +230,28 @@
                     document.getElementById('SLAResult1').innerHTML = listaHTML;
                 } else {
                     document.getElementById('SLAResult1').innerHTML = 'Metrica non presente nel contratto';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante la richiesta', error);
+                alert('Si è verificato un errore durante la richiesta');
+            });
+    }
+
+    function ViolationsProbability(){
+        const formData = new FormData(document.getElementById('SLAForm4'));
+
+        fetch('http://localhost:80/sla_manager/sla_probability_violations', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                if (data.state === 0) {
+                    document.getElementById('SLAResult2').textContent = data.prevision;
+                } else {
+                    document.getElementById('SLAResult2').innerHTML = 'Metrica non presente nel contratto';
                 }
             })
             .catch(error => {

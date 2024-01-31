@@ -13,7 +13,7 @@ services:
       - mynetwork
     container_name: gateway
     ports:
-      - 8085:8085
+      - "80:80"
     depends_on:
       - auth_serv
       - city_serv
@@ -45,7 +45,7 @@ services:
     volumes:
       - ./mysql_volume_city:/var/lib/mysql
     ports:
-      - 3307:3306
+      - "3307:3306"
     restart: always
 
   mysql_api:
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./mysql_volume_api:/var/lib/mysql
     ports:
-      - 3308:3306
+      - "3308:3306"
     restart: always
 
   mysql_nfy:
@@ -73,7 +73,7 @@ services:
     volumes:
       - ./mysql_volume_nfy:/var/lib/mysql
     ports:
-      - 3311:3306
+      - "3311:3306"
     restart: always
 
   mysql_SLA:
@@ -87,7 +87,7 @@ services:
     volumes:
       - ./mysql_volume_sla:/var/lib/mysql
     ports:
-      - 3310:3306
+      - "3310:3306"
     restart: always
 
   auth_serv:
@@ -105,7 +105,7 @@ services:
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
     ports:
-      - 5000:5000
+      - "5000:5000"
     restart: always
     depends_on:
       - mysql_auth
@@ -125,7 +125,7 @@ services:
         MYSQL_ROOT_PASSWORD: '12345'
         SECRET_KEY: "mySecretKey"
     ports:
-      - 5001:5001
+      - "5001:5001"
     restart: always
     depends_on:
       - mysql_city
@@ -147,7 +147,7 @@ services:
       MYSQL_ROOT_PASSWORD: '12345'
       SECRET_KEY: "mySecretKey"
     ports:
-      - 5002:5002
+      - "5002:5002"
     restart: always
     depends_on:
       - mysql_api
@@ -170,7 +170,7 @@ services:
       MYSQL_ROOT_PASSWORD: '12345'
       SECRET_KEY: "mySecretKey"
     ports:
-      - 5003:5003
+      - "5003:5003"
     restart: always
     depends_on:
       - mysql_nfy
@@ -184,10 +184,10 @@ services:
     container_name: kafka
     restart: always
     ports:
-      - 9095:9095
-      - 9096:9096
+      - "9095:9095"
+      - "9096:9096"
     depends_on:
-      - zookeeper # deve partire prima zookeeper in quanto c'è il depends on
+      - zookeeper
     environment:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9095, OUTSIDE://localhost:9096
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT, OUTSIDE:PLAINTEXT
@@ -204,7 +204,7 @@ services:
       - mynetwork
     container_name: zookeeper
     ports:
-      - 2181:2181
+      - "2181:2181"
 
 
   prometheus:
@@ -218,12 +218,10 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml" #percorso file configurazione
-      - "--storage.tsdb.path=/prometheus" #Questa opzione imposta il percorso in cui Prometheus memorizzerà i dati
-          # a series temporali (TSDB, Time Series Database). Il TSDB è il motore di archiviazione utilizzato da
-          # Prometheus per mantenere i dati storici e consentire query temporali efficienti.
-      - "--web.console.libraries=/etc/prometheus/console_libraries" #javascript per interfaccia utente
-      - "--web.console.templates=/etc/prometheus/consoles" # imposta percorso dei template della console (UI)
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
     depends_on:
       - cadvisor
       - node_exporter
@@ -232,7 +230,7 @@ services:
       - city_serv
       - nfy_serv
 
-  cadvisor: # raccolta metriche prestazioni DS
+  cadvisor:
     image: google/cadvisor:latest
     restart: always
     networks:
@@ -246,7 +244,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
 
-  node_exporter: # raccolta metriche prestazioni host
+  node_exporter:
     image: prom/node-exporter:latest
     restart: always
     networks:

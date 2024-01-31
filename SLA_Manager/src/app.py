@@ -1,12 +1,16 @@
+import string
 import time, requests, os
 from datetime import datetime, timedelta
 import logging
 from threading import Thread
+from urllib.parse import quote
 from flask_cors import CORS
 import schedule
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
+import pandas as pd
+from statsmodels.tsa.arima.model import ARIMA
 
 # Recupera le variabili d'ambiente
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -15,7 +19,7 @@ db_password = os.environ.get('MYSQL_PASSWORD')
 db_name = os.environ.get('MYSQL_DATABASE')
 db_serv_name = os.environ.get('DB_SERV_NAME')
 
-#configurazione app flask
+# configurazione app flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
@@ -45,7 +49,7 @@ class Violation(db.Model):
     sla = relationship('SLA_table')
 
 
-#metodo che permette di aggiungere una metrica nel db
+# metodo che permette di aggiungere una metrica nel db
 @app.route('/add_metric', methods=['POST'])
 def add_metric():
     if request.method == 'POST':
@@ -61,7 +65,7 @@ def add_metric():
             return jsonify({'message': 0})
 
 
-#metodo che permette di rimuovere una metrica dal db
+# metodo che permette di rimuovere una metrica dal db
 @app.route('/remove_metric', methods=['POST'])
 def remove_metric():
     sla = db.session.query(SLA_table).filter((SLA_table.metric_name == request.form['metric_name'])
@@ -105,13 +109,12 @@ def get_sla_status():
     return jsonify({'state': 2})
 
 
-
-#metodo utilizzato per il calcolo delle violazioni nelle ultime 1, 3, 6 ore
+# metodo utilizzato per il calcolo delle violazioni nelle ultime 1, 3, 6 ore
 @app.route('/sla_past_violations', methods=['POST'])
 def get_sla_past_violations():
     sla = SLA_table.query.filter((SLA_table.metric_name == request.form['metric_name'])
                                  & (SLA_table.job_name == request.form['job_name'])).first()
-    # violations = Violation.query.filter_by(sla_id=sla.id).all()
+
     if not sla:
         return jsonify({'state': 1})
 
@@ -141,7 +144,7 @@ def get_sla_past_violations():
         'violations_count_last_hour': violations_count_last_hour,
         'violations_count_last_3_hours': violations_count_last_3_hours,
         'violations_count_last_6_hours': violations_count_last_6_hours,
-        # 'probability_of_violation':  # Calcolo della probabilità di violazione nei prossimi X minuti
+
     })
 
 
@@ -149,7 +152,6 @@ def prometheus_request(metric_name):
     url = "http://prometheus:9090/api/v1/query"
     params = {
         'query': metric_name,
-        # 'time': 'timestamp', questo se mi interessano info su tempi non attuali
     }
 
     response = requests.post(url, params=params)
@@ -160,7 +162,7 @@ def prometheus_request(metric_name):
         return data
 
 
-#metodo eseguito periodicamente per monitorare le possibili violazioni nel tempo
+# metodo eseguito periodicamente per monitorare le possibili violazioni nel tempo
 def monitor_system_metrics():
     logging.error("MONITORING")
 
@@ -180,6 +182,69 @@ def monitor_system_metrics():
                         db.session.commit()
 
 
+@app.route('/sla_probability_violations', methods=['POST'])
+def get_sla_probability_violations():
+    metric_name = request.form['metric_name']
+    job_name = request.form['job_name']
+    minutes = request.form['minutes']
+    desired_value = float(request.form['desired_value'])
+
+    response = requests.get('http://prometheus:9090/api/v1/query_range',
+                            params={'query': metric_name, 'start': time.time() - 21600, 'end': time.time(),
+                                    'step': "2m"})
+
+    results = response.json()['data']['result']
+
+    current_values = None
+
+    for result in results:
+        if result['metric']['job'] == job_name:
+            current_values = result['values']
+
+    logging.error(current_values)
+
+    # Crea un DataFrame
+    df = pd.DataFrame(current_values, columns=['time', 'value'])
+    df['time'] = pd.to_datetime(df['time'], unit='s')
+    df['value'] = pd.to_numeric(df['value'], errors='coerce')
+    df = df.set_index('time')
+
+    logging.error(df)
+
+    model = ARIMA(df, order=(1, 1, 1))
+    results = model.fit()
+    steps = int(minutes) / 2
+
+    # Predizione della probabilità futura
+    forecast = results.get_forecast(steps=int(steps))
+    conf_int = forecast.conf_int()
+
+    umax = conf_int['upper value'].max()
+    lmax = conf_int['lower value'].max()
+    umin = conf_int['upper value'].min()
+    lmin = conf_int['lower value'].min()
+    distanzasup = umax - lmax
+    distanzainf = umin - lmin
+    psup = 0
+
+    if umax > desired_value:
+        psup += (umax - desired_value) / distanzasup
+    if lmax < desired_value:
+        psup += (desired_value - lmax) / distanzasup
+
+    pinf = 0
+    if umin > desired_value:
+        psup += (umin - desired_value) / distanzainf
+    if lmin < desired_value:
+        psup += (desired_value - lmin) / distanzainf
+
+    probability_value = min(max(psup, pinf), 1)
+
+    return jsonify({
+        'state': 0,
+        'prevision': probability_value,
+    })
+
 
 # Configura dell'intervallo di esecuzione della funzione (ogni mezz'ora)
 schedule.every(1).minutes.do(monitor_system_metrics)
@@ -195,13 +260,6 @@ def run_scheduler():
 # Avvia il thread per eseguire il job in background
 scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
-
-
-# @app.before_request
-# def init_db():
-#     with app.app_context():
-#         db.create_all()
-#         db.session.commit()
 
 
 if __name__ == '__main__':

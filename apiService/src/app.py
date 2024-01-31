@@ -90,7 +90,6 @@ def check_weather():
             db_connections_total.inc()
 
             users = db.session.query(User).all()
-            #cofronto tra i dati sugli eventi richiesti dagli utenti e gli eventi attualmente in atto
             for user in users:
                 db_connections_total.inc()
                 user_city_events = db.session.query(Info_meteo).filter(Info_meteo.user_id == user.id).all()

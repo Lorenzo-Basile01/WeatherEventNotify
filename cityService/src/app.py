@@ -15,7 +15,7 @@ db_password = os.environ.get('MYSQL_PASSWORD')
 db_name = os.environ.get('MYSQL_DATABASE')
 db_serv_name = os.environ.get('DB_SERV_NAME')
 
-#configurazione app flask
+# configurazione app flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql://{db_user}:{db_password}@{db_serv_name}/{db_name}'
@@ -25,7 +25,7 @@ db.init_app(app)
 CORS(app)
 metrics = PrometheusMetrics(app)
 
-#metriche prometheus
+# metriche prometheus
 users_city_request_metric = Counter('users_city_request_total', 'Numero totale di richieste a city_serv')
 api_response_time = Gauge('api_response_time_seconds', 'Tempo di risposta dell\'API in secondi')
 db_connections_total = Counter('db_connections_total', 'Numero totale di connessioni al DB')
@@ -41,6 +41,7 @@ def send_kafka(message):
     producer.send(topic_name, json_message.encode('utf-8'))
 
     producer.flush()
+
 
 @app.before_request
 def init_db():
@@ -118,7 +119,6 @@ def home(token):
         return jsonify({'state': 0})
 
 
-
 def measure_metrics():
     logging.error("CITY_METRICS")
 
@@ -134,6 +134,7 @@ def measure_metrics():
 
 schedule.every(1).minutes.do(measure_metrics)
 
+
 # Funzione per eseguire il job in un thread separato
 def run_scheduler():
     while True:
@@ -146,4 +147,7 @@ scheduler_thread = Thread(target=run_scheduler)
 scheduler_thread.start()
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        db.session.commit()
     app.run()

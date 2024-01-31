@@ -4,7 +4,7 @@ metadata:
   name: city-service
   namespace: ds
 spec:
-  selector: # Specifica che questo servizio indirizzerà il traffico verso i pod che hanno l'etichetta app: city.
+  selector:
     app: city
   ports:
     - protocol: TCP
@@ -23,12 +23,12 @@ metadata:
   name: city-deploy
   namespace: ds
 spec:
-  replicas: 1 #numero di pod
-  selector: #Specifica un insieme di etichette che il Deployment userà per identificare quali pod gestire
-    matchLabels: #Specifica una singola etichetta, in questo caso, "app: city". Ciò significa che il Deployment gestirà i pod che hanno l'etichetta "app: city".
+  replicas: 1
+  selector:
+    matchLabels:
       app: city
-  template: # definisce il modello per la creazione dei pod
-    metadata: # Contiene le etichette per i pod creati, con l'etichetta "app: city
+  template:
+    metadata:
       labels:
         app: city
     spec:

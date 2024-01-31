@@ -35,7 +35,6 @@ def consuma_da_kafka():
             for record in value:
                 json_message = record.value.decode('utf-8')
                 dictionary_message = json.loads(json_message)
-                # logging.error(dictionary_message)
                 with app.app_context():
                     if db.session.query(Info_meteo).filter((Info_meteo.city == dictionary_message['city']) &
                                                            (Info_meteo.user_id == dictionary_message[
